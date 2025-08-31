@@ -7,19 +7,19 @@ const sequelize = new Sequelize(
   process.env.DB_PASS,
   {
     host: process.env.DB_HOST,
-    port: 3306,
-    dialect: "mysql",
+    port: process.env.DB_PORT || 5432, // default port for Postgres
+    dialect: "postgres", // ✅ switched from mysql → postgres
     logging: false,
   }
 );
 
 // Check if the connection is established successfully
-sequelize.sync()
+sequelize.authenticate()
   .then(() => {
-    console.log('Database connection established successfully.');
+    console.log("✅ Database connection established successfully.");
   })
   .catch((error) => {
-    console.error('Unable to connect to the database:', error);
+    console.error("❌ Unable to connect to the database:", error);
   });
- 
+
 module.exports = sequelize;

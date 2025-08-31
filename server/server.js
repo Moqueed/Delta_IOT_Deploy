@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const { sequelize } = require("./models");
+const path = require("path");
 const activePositionRoutes = require("./routes/activePositionRoutes");
 const candidateRoutes = require("./routes/candidateRoutes");
 const hrVacancyRoutes = require("./routes/hrVacancyRoutes"); // Keep this
@@ -23,6 +24,10 @@ const helmet = require("helmet");
 
 
 const app = express();
+const clientBuildPath = path.join(__dirname, "../client/dist");
+console.log("clientBuildPath", clientBuildPath);
+app.use(express.static(clientBuildPath));
+
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
@@ -57,7 +62,7 @@ app.use("/api/hr/protected", protectedHrRoutes);
 
 
 // Sync Database & Start Server
-sequelize.sync({ alter: false }).then(() => { // Use 'alter: true'
+sequelize.sync({ alter: true }).then(() => { // Use 'alter: true'
   console.log("✅ Database Synced!");
 
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
