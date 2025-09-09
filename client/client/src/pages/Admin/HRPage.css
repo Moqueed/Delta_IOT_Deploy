@@ -1,0 +1,83 @@
+.main-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background-color: #f7f9fc;
+  overflow: hidden;
+}
+
+.main-container > div:nth-child(1) {
+  width: 30%;
+  background-color: #e2e8f0;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  border-right: 2px solid #cbd5e1;
+}
+
+.main-container > div:nth-child(2) {
+  width: 50%;
+  background-color: #ffffff;
+  padding: 32px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.main-container > div:nth-child(3) {
+  width: 20%;
+  background-color: #f1f5f9;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  border-left: 2px solid #cbd5e1;
+}
+
+.form-title {
+  margin-bottom: 20px;
+  color: #1e293b;
+}
+
+.container-card {
+  height: 80%;
+  background: #e0f2fe;
+  width: 70%;
+  display: flex;
+  justify-content: center;
+}
+
+.button-panel button{
+  width: 80%;
+}
+
+.hr-list-item {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.hr-list-item:hover {
+  background-color: #dbeafe;
+}
+
+.hr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 10vh;
+  background-color: #4096ff; /* Ant Design primary color */
+  padding: 10px 20px;
+  color: white;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-sizing:border-box;
+  height: 85px;
+  width: 100vw;
+}

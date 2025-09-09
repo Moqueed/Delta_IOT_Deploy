@@ -1,0 +1,155 @@
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+}
+/* Floating shapes background */
+.floating-shapes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Individual shape styles */
+.shape {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  opacity: 0.2;
+  animation: floatShape 20s infinite ease-in-out;
+}
+
+/* Unique positions and colors */
+.shape1 {
+  background-color: #ff6f61;
+  top: 10%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.shape2 {
+  background-color: #42a5f5;
+  top: 60%;
+  left: 70%;
+  animation-delay: 5s;
+}
+
+.shape3 {
+  background-color: #66bb6a;
+  top: 40%;
+  left: 40%;
+  animation-delay: 10s;
+}
+
+/* Float animation */
+@keyframes floatShape {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(-30px) scale(1.1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.2;
+  }
+}
+
+/* Main wrapper using flex */
+.login-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Left: Form section */
+.login-left {
+  width: 50%;
+  background: #fdfdfd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  /* background-image: url('/images/pattern.png'); optional honeycomb style */
+  background-size: contain;
+}
+
+.avatar {
+  width: 80px;
+  margin-bottom: 10px;
+}
+
+.register-link {
+  display: block;
+  margin-top: 15px;
+}
+
+.login-box {
+  width: 80%;
+  max-width: 400px;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  animation: fadeInLeft 1s ease-in-out;
+}
+
+/* Right: Illustration */
+.login-right {
+  width: 50%;
+  background: linear-gradient(to right, #fff8dc, #ffe6b3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-right img {
+  width: 90%;
+  max-width: 600px;
+}
+
+.login-image {
+  max-width: 80%;
+  height: auto;
+}
+
+.login-page {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: linear-gradient(to right, #f9f9f9, #e0f7fa);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-card {
+  z-index: 2;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  padding: 30px;
+  width: 500px;
+}
+/* Optional animation */
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

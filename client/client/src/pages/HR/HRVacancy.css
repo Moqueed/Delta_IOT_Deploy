@@ -1,0 +1,66 @@
+.hr-vacancy-container {
+  padding: 20px;
+  background-color: #f9f9f9;
+  width: 100vw;
+  overflow-y: hidden;
+}
+
+.hr-vacancy-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #7f9f8b;
+  padding: 16px 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+  min-height: 10vh;
+  width: 95vw;
+}
+
+
+.header-center {
+  display: flex;
+  align-items: center;
+}
+
+/* .header-left {
+  flex: 1;
+} */
+
+.header-center {
+  width: 100%;
+  flex: 1;
+  justify-content: center;
+}
+
+/* .header-right {
+  flex: 1;
+  justify-content: flex-end;
+} */
+
+/* .header-title {
+  margin: 0 auto;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1890ff;
+} */
+
+.icon {
+  font-size: 24px;
+  color: #1890ff;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.icon:hover {
+  color: #ff4d4f;
+}
+
+.table-container {
+  background-color: #ffffff;
+  width: 95vw;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}

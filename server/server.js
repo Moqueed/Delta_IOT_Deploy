@@ -57,7 +57,7 @@ app.use("/api/assignedCandidate", assignedCandidateRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin/protected", protectedAdminRoutes);
-app.use("/api/hr/protected", protectedHrRoutes);
+app.use("/api/hr/protected", protectedHrRoutes); 
 
 
 

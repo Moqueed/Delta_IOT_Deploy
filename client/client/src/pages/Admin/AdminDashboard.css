@@ -1,0 +1,117 @@
+.admin-dashboard {
+  height: 100vh;
+  background-color: #ffffff;
+  overflow: hidden;         /* Prevents both scrollbars */
+  width: 100vw;             /* Ensures full width */
+  box-sizing: border-box;   /* Avoids overflow from padding */
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 10vh;
+  padding: 10px 20px;
+  background-color: #6bbe86;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  box-sizing: border-box;
+  height: 100px;
+  width: 100vw;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo {
+  height: 40px;
+}
+
+.home-icon {
+  font-size: 24px;
+  color: #15181a;
+  cursor: pointer;
+}
+
+.header-title {
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+  flex-grow: 1;
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.welcome-text {
+  font-size: 14px;
+}
+
+.logout-button {
+  margin-left: 10px;
+}
+
+.dashboard-body {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.section-title {
+  margin-bottom: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.dashboard-row {
+  width: 100%;
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  justify-content: center; /* 3 cards per row */
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 40px 30px;
+  padding-bottom: 40px;
+}
+
+.dashboard-card-col {
+  display: flex;
+  justify-content: center;
+}
+
+.dashboard-card {
+  width: 220px;
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-width: 6px;
+  border-style: solid;
+  border-radius: 20px;
+  padding: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+/*.card-icon {
+  font-size: 50px;
+  color: #1890ff;
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: bold;
+} */
