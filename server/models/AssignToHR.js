@@ -14,7 +14,7 @@ const AssignToHR = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true, // allow null because candidate may not exist in Candidate table
       references: {
-        model: "Candidates",
+        model: "candidates",
         key: "id",
       },
     },
@@ -53,6 +53,7 @@ const AssignToHR = sequelize.define(
   },
   {
     timestamps: true,
+    freezeTableName: true,
   }
 );
 

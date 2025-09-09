@@ -81,6 +81,7 @@ const Candidate = sequelize.define(
   },
   { 
     tableName: "candidates",
+    freezeTableName: true,
     timestamps: false }
 );
 
@@ -134,6 +135,7 @@ const Candidate = sequelize.define(
 //     console.error("❌ Error deleting ActiveList entry:", error);
 //   }
 // });
+
 
 // ✅ Define associations inside a function (index.js will call this)
 Candidate.associate = (models) => {
