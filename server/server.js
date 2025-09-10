@@ -43,6 +43,11 @@ app.get("/", (req, res) => {
   res.send("Server is Running! Welcome to Delta IoT API.");
 });
 
+// ✅ Catch-all for React Router (fixes Cannot GET /login)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientBuildPath, "index.html"));
+});
+
 app.use(helmet());
 app.use("/api/", apiLimiter);
 app.use("/api/positions", activePositionRoutes);
