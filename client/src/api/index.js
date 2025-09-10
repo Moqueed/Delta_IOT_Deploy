@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://delta-iot-deploy.onrender.com/api",
-  headers: { "Content-Type": "application/json" },
+  baseURL: "https://delta-iot-deploy.onrender.com",
+  headers: { "Content-Type": "application/json" },cd 
 });
 
 // ✅ Add token to headers if available
