@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Form, Button, Input, Select, Typography, Avatar, Modal } from "antd";
+import { Form, Button, Input, Select, Typography, message, Avatar } from "antd";
 import { LoginUser } from "../../api/users";
 import { jwtDecode } from "jwt-decode";
 import { UserOutlined } from "@ant-design/icons";
@@ -24,37 +24,27 @@ const LoginPage = () => {
 
         // Store essential user info
         localStorage.setItem("token", response.token);
-        localStorage.setItem("role", decoded.role || values.role);
-        localStorage.setItem("userEmail", decoded.email || values.email);
+        localStorage.setItem("role", decoded.role || values.role); // from JWT
+        localStorage.setItem("userEmail", decoded.email || values.email); // from JWT
         if (decoded.role === "admin") {
           localStorage.setItem("adminName", "Rizwana Begum");
         }
 
-        // Show success modal
-        Modal.success({
-          title: "Login Successful 🎉",
-          content: `Welcome, ${decoded.role || values.role}!`,
-          onOk: () => {
-            const role = (decoded.role || values.role).toLowerCase();
-            if (role === "admin") {
-              navigate("/admin-dashboard", { replace: true });
-            } else if (role === "hr") {
-              navigate("/hr-dashboard", { replace: true });
-            } else {
-              Modal.error({
-                title: "Invalid Role",
-                content: "You do not have access to this system.",
-              });
-            }
-          },
-        });
+        message.success(`Welcome, ${decoded.role || values.role}!`);
+
+        // Navigate based on role
+        const role = (decoded.role || values.role).toLowerCase();
+        if (role === "admin") {
+          navigate("/admin-dashboard", { replace: true });
+        } else if (role === "hr") {
+          navigate("/hr-dashboard", { replace: true });
+        } else {
+          message.error("Invalid role");
+        }
       }
     } catch (err) {
       console.error("❌ Login failed:", err);
-      Modal.error({
-        title: "Login Failed ❌",
-        content: "Invalid email or password. Please try again.",
-      });
+      message.error("Invalid email or password. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -82,7 +72,9 @@ const LoginPage = () => {
 
             <Form.Item
               name="password"
-              rules={[{ required: true, message: "Please enter your password" }]}
+              rules={[
+                { required: true, message: "Please enter your password" },
+              ]}
             >
               <Input.Password placeholder="Enter your password" prefix="🔒" />
             </Form.Item>

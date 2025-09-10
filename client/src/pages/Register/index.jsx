@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Button, Input, Form, Select, message, Typography, Card, Modal } from "antd";
+import { Button, Input, Form, Select, message, Typography, Card } from "antd";
 import { RegisterUser } from "../../api/users";
 import "./RegisterPage.css"; // Import the CSS
 
@@ -11,24 +11,17 @@ const { Title, Text } = Typography;
 const RegisterPage = () => {
   const navigate = useNavigate();
 
- const onFinish = async (values) => {
-  try {
-    const response = await RegisterUser(values);
-    if (response) {
-      Modal.success({
-        title: "Registration Successful 🎉",
-        content: `${values.role} account has been created successfully!`,
-        onOk: () => navigate("/login"), // redirect after closing
-      });
+  const onFinish = async (values) => {
+    try {
+      const response = await RegisterUser(values);
+      if (response) {
+        message.success(`${values.role} registration successful! Redirecting to login...`);
+        navigate("/login");
+      }
+    } catch (err) {
+      message.error("Registration failed. Please try again.");
     }
-  } catch (err) {
-    Modal.error({
-      title: "Registration Failed ❌",
-      content: "Something went wrong. Please try again.",
-    });
-  }
-};
-
+  };
 
   return (
     <div className="register-page">
