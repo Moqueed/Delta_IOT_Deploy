@@ -328,7 +328,7 @@ const ApprovalsPage = () => {
                           {formData.attachments && (
                             <div style={{ marginTop: 8 }}>
                               <a
-                                href={`http://localhost:5000${formData.attachments.replace(
+                                href={`https://delta-iot-backend.onrender.com${formData.attachments.replace(
                                   "/uploads",
                                   "/api/uploads"
                                 )}`}

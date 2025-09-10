@@ -387,7 +387,7 @@ const CandidateForm = ({ candidate, onUpdate }) => {
             {resumeUrl && (
               <div style={{ marginTop: 8 }}>
                 <a
-                  href={`http://localhost:5000${resumeUrl.replace(
+                  href={`https://delta-iot-backend.onrender.com${resumeUrl.replace(
                     "/uploads",
                     "/api/uploads"
                   )}`}

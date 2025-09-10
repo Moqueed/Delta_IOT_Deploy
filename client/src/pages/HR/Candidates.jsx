@@ -518,7 +518,7 @@ const Candidate = () => {
                 {attachmentUrl && (
                   <Form.Item label="Resume Preview">
                     <a
-                      href={`http://localhost:5000/api/uploads/${attachmentUrl}`}
+                      href={`https://delta-iot-backend.onrender.com/api/uploads/${attachmentUrl}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => message.info("Opening resume preview")}
