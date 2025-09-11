@@ -15,7 +15,7 @@ const HRListPage = () => {
   const loadHRs = async () => {
     try {
       const res = await getHRS();
-      setHrList(res);
+      setHrList(Array.isArray(res) ? res : []);
     } catch (err) {
       message.error("Failed to fetch HRs");
       console.error(err);
@@ -28,7 +28,9 @@ const HRListPage = () => {
 
   const handleSelect = (hr) => {
     setSelectedHR(hr);
-    form.setFieldsValue(hr);
+    if (hr && typeof hr === "object") {
+      form.setFieldsValue(hr);
+    }
   };
 
   const handleAddNew = async () => {
@@ -39,31 +41,27 @@ const HRListPage = () => {
       form.resetFields();
       setSelectedHR(null);
       loadHRs();
-    } catch {
+    } catch (err) {
       message.error("Failed to add HR");
+      console.error(err);
     }
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    message.success("Logout successfully");
-    window.location.href = "/login";
-  };
-
   const handleSave = async () => {
+    if (!selectedHR) {
+      message.warning("No HR selected for update.");
+      return;
+    }
     try {
       const values = await form.validateFields();
-      if (selectedHR) {
-        await saveUpdateHR(selectedHR.id, values);
-        message.success("HR updated successfully");
-        form.resetFields();
-        setSelectedHR(null);
-        loadHRs();
-      } else {
-        message.warning("No HR selected for update.");
-      }
-    } catch {
-      message.error("Failed to save HR");
+      await saveUpdateHR(selectedHR.id, values);
+      message.success("HR updated successfully");
+      form.resetFields();
+      setSelectedHR(null);
+      loadHRs();
+    } catch (err) {
+      message.error("Failed to update HR");
+      console.error(err);
     }
   };
 
@@ -78,9 +76,16 @@ const HRListPage = () => {
       form.resetFields();
       setSelectedHR(null);
       loadHRs();
-    } catch {
+    } catch (err) {
       message.error("Failed to delete HR");
+      console.error(err);
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    message.success("Logout successfully");
+    window.location.href = "/login";
   };
 
   return (
@@ -117,7 +122,7 @@ const HRListPage = () => {
         <div className="hr-sidebar">
           <List
             itemLayout="horizontal"
-            dataSource={hrList}
+            dataSource={Array.isArray(hrList) ? hrList : []}
             locale={{ emptyText: "No HRs Available" }}
             renderItem={(item) => (
               <List.Item
@@ -131,9 +136,9 @@ const HRListPage = () => {
                 }}
               >
                 <List.Item.Meta
-                  avatar={<Avatar>{item.name?.[0]?.toUpperCase()}</Avatar>}
-                  title={<strong>{item.name}</strong>}
-                  description={item.email}
+                  avatar={<Avatar>{item.name?.[0]?.toUpperCase() ?? "H"}</Avatar>}
+                  title={<strong>{item.name ?? "Unknown"}</strong>}
+                  description={item.email ?? ""}
                 />
               </List.Item>
             )}
@@ -200,14 +205,14 @@ const HRListPage = () => {
             <Button
               type="default"
               disabled={!selectedHR}
-              onClick={() => form.setFieldsValue(selectedHR)}
+              onClick={() => selectedHR && form.setFieldsValue(selectedHR)}
             >
               Edit
             </Button>
-            <Button type="primary" onClick={handleSave}>
+            <Button type="primary" onClick={handleSave} disabled={!selectedHR}>
               Update
             </Button>
-            <Button onClick={() => form.resetFields()}>Cancel</Button>
+            <Button onClick={() => { form.resetFields(); setSelectedHR(null); }}>Cancel</Button>
           </Space>
         </div>
       </div>
