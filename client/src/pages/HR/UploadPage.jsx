@@ -1,7 +1,7 @@
+// pages/UploadPage.js
 import React, { useEffect, useState } from "react";
-import { Layout, List, Typography, message, Spin, Button } from "antd";
+import { Layout, List, Typography, Spin, Button, App } from "antd";
 import { fetchResumeFile, getUploadsByHR } from "../../api/upload";
-import axiosInstance from "../../api";
 import DashboardHomeLink from "../../components/DashboardHomeLink";
 import { LogoutOutlined } from "@ant-design/icons";
 import { useHR } from "../../components/HRContext";
@@ -16,11 +16,14 @@ const UploadPage = () => {
   const [loading, setLoading] = useState(false);
   const { hrName } = useHR();
 
-  // ✅ Fetch uploaded files using axiosInstance
+  // ✅ AntD v5 message hook
+  const { message } = App.useApp();
+
+  // Fetch uploaded files
   const fetchUploadedFiles = async () => {
     const hrEmail = localStorage.getItem("userEmail");
     try {
-      const files = await getUploadsByHR(hrEmail); // ✅ proper use
+      const files = await getUploadsByHR(hrEmail);
       setFileList(files);
     } catch (error) {
       message.error("Failed to load uploaded files");
@@ -56,16 +59,17 @@ const UploadPage = () => {
 
   return (
     <div className="total-master-data-container">
+      {/* Header */}
       <div className="candidate-header">
         <div className="header-left">
           <img src="/images/hrms-logo.jpg" alt="logo" className="logo" />
           <DashboardHomeLink />
         </div>
 
-        <h2>uploads</h2>
+        <h2>Uploads</h2>
 
         <div className="header-right">
-          <NotificationBell/>
+          <NotificationBell />
           <span className="welcome-text">Welcome: {hrName}</span>
           <Button
             icon={<LogoutOutlined />}
@@ -80,6 +84,7 @@ const UploadPage = () => {
         </div>
       </div>
 
+      {/* Upload Body */}
       <div className="upload-body">
         <Layout style={{ minHeight: "100vh" }}>
           <Sider width={300} style={{ background: "#f0f2f5", padding: "20px" }}>
@@ -92,11 +97,11 @@ const UploadPage = () => {
                   style={{
                     cursor: "pointer",
                     backgroundColor:
-                      item === selectedFile ? "#e6f7ff" : undefined,
+                      item.filename === selectedFile ? "#e6f7ff" : undefined,
                   }}
-                  onClick={() => handleFileClick(item.filename)} // Use filename here
+                  onClick={() => handleFileClick(item.filename)}
                 >
-                  {item.filename} {/* ✅ Safely render string */}
+                  {item.filename}
                 </List.Item>
               )}
             />

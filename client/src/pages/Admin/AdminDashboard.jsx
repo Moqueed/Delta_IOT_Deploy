@@ -1,27 +1,21 @@
 import React from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { Card, Row, Col, Typography, Button, message } from "antd";
+import { useNavigate } from "react-router-dom";
+import { Card, Row, Col, Button, App } from "antd";
 import {
   CheckCircleOutlined,
   FileTextOutlined,
   TeamOutlined,
   SearchOutlined,
   UserSwitchOutlined,
-  DatabaseOutlined,
-  UserOutlined,
-  AppstoreAddOutlined,
-  FileOutlined,
   LogoutOutlined,
-  HomeOutlined,
 } from "@ant-design/icons";
 import "./AdminDashboard.css";
 import { useAdmin } from "../../components/AdminContext";
 
-const { Title } = Typography;
-
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { adminName } = useAdmin();
+  const { message } = App.useApp(); // ✅ AntD v5
 
   const routeMap = {
     "active-positions": "/admin-dashboard/active-positions",
@@ -38,69 +32,12 @@ const AdminDashboard = () => {
   };
 
   const adminSections = [
-    {
-      key: "approvals",
-      icon: <CheckCircleOutlined />,
-      title: "Approvals",
-      borderColor: "#FF6347",
-    },
-    {
-      key: "active-positions",
-      icon: <FileTextOutlined />,
-      title: "Active Positions",
-      borderColor: "#FFD700",
-    },
-    {
-      key: "hr-list",
-      icon: <TeamOutlined />,
-      title: "HR's List",
-      borderColor: "#32CD32",
-    },
-    {
-      key: "hr-data-tracker",
-      icon: <SearchOutlined />,
-      title: "HR Tracker",
-      borderColor: "#1E90FF",
-    },
-    {
-      key: "assign-to-hr",
-      icon: <UserSwitchOutlined />,
-      title: "Assign to HR",
-      borderColor: "#FF4500",
-    },
+    { key: "approvals", icon: <CheckCircleOutlined />, title: "Approvals", borderColor: "#FF6347" },
+    { key: "active-positions", icon: <FileTextOutlined />, title: "Active Positions", borderColor: "#FFD700" },
+    { key: "hr-list", icon: <TeamOutlined />, title: "HR's List", borderColor: "#32CD32" },
+    { key: "hr-data-tracker", icon: <SearchOutlined />, title: "HR Tracker", borderColor: "#1E90FF" },
+    { key: "assign-to-hr", icon: <UserSwitchOutlined />, title: "Assign to HR", borderColor: "#FF4500" },
   ];
-
-  const renderSection = (section) => (
-    <Col
-      key={section.key}
-      xs={24}
-      sm={12}
-      md={8}
-      lg={6}
-      xl={4}
-      className="dashboard-card-col"
-    >
-      <Card
-        hoverable
-        className="dashboard-card"
-        style={{ borderColor: section.borderColor }}
-        onClick={() => {
-          navigate(routeMap[section.key] || "/unauthorized");
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "scale(1.05)";
-          e.currentTarget.style.boxShadow = "0 8px 20px rgba(0, 0, 0, 0.5)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.3)";
-        }}
-      >
-        <div className="card-icon">{section.icon}</div>
-        <h3 className="card-title">{section.title}</h3>
-      </Card>
-    </Col>
-  );
 
   return (
     <div className="admin-dashboard">
@@ -127,7 +64,6 @@ const AdminDashboard = () => {
 
       {/* Body */}
       <div className="dashboard-body">
-        {/* Admin Section */}
         <Row gutter={[32, 32]} className="dashboard-row">
           {adminSections.map((section) => (
             <Col

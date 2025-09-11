@@ -1,4 +1,4 @@
-import { Card, Row, Col, Typography, Button, message } from "antd";
+import { Card, Row, Col, Typography, Button, App } from "antd"; // ✅ import App
 import {
   FileOutlined,
   DatabaseOutlined,
@@ -14,11 +14,14 @@ import { useNavigate } from "react-router-dom";
 const { Title } = Typography;
 
 const HRDashboard = () => {
-  const{hrName} = useHR();
+  const { hrName } = useHR();
   const navigate = useNavigate();
 
+  // ✅ AntD v5 message hook
+  const { message } = App.useApp();
+
   // ✅ Logout using React Router
-   const handleLogout = () => {
+  const handleLogout = () => {
     localStorage.clear();
     message.success("Logout successfully");
     window.location.href = "/login";
@@ -26,36 +29,11 @@ const HRDashboard = () => {
 
   // ✅ Card sections
   const sections = [
-    {
-      key: "vacancies",
-      icon: <FileOutlined />,
-      title: "Vacancies",
-      borderColor: "#FFD700",
-    },
-    {
-      key: "total-data",
-      icon: <DatabaseOutlined />,
-      title: "Total Data",
-      borderColor: "#32CD32",
-    },
-    {
-      key: "active-list",
-      icon: <UserOutlined />,
-      title: "Active List",
-      borderColor: "#1E90FF",
-    },
-    {
-      key: "add-candidate",
-      icon: <AppstoreAddOutlined />,
-      title: "Add New Candidate",
-      borderColor: "#FF4500",
-    },
-    {
-      key: "upload",
-      icon: <FileTextOutlined />,
-      title: "Upload",
-      borderColor: "#32CD32",
-    },
+    { key: "vacancies", icon: <FileOutlined />, title: "Vacancies", borderColor: "#FFD700" },
+    { key: "total-data", icon: <DatabaseOutlined />, title: "Total Data", borderColor: "#32CD32" },
+    { key: "active-list", icon: <UserOutlined />, title: "Active List", borderColor: "#1E90FF" },
+    { key: "add-candidate", icon: <AppstoreAddOutlined />, title: "Add New Candidate", borderColor: "#FF4500" },
+    { key: "upload", icon: <FileTextOutlined />, title: "Upload", borderColor: "#32CD32" },
   ];
 
   // ✅ Route mapping
@@ -114,13 +92,11 @@ const HRDashboard = () => {
                 }
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = "scale(1.05)";
-                  e.currentTarget.style.boxShadow =
-                    "0 8px 20px rgba(0, 0, 0, 0.5)";
+                  e.currentTarget.style.boxShadow = "0 8px 20px rgba(0, 0, 0, 0.5)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "scale(1)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 10px rgba(0, 0, 0, 0.3)";
+                  e.currentTarget.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.3)";
                 }}
               >
                 <div className="card-icon">{section.icon}</div>

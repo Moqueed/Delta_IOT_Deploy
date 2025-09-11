@@ -1,20 +1,22 @@
 // pages/RejectedDataPage.js
 import React, { useEffect, useState } from "react";
-import { Table, Typography, Tag, Spin, Alert, Button } from "antd";
+import { Table, Spin, Alert, Button, Tag, App } from "antd"; // ✅ use App hook
 import axios from "axios";
-import DashboardHomeLink from "../../components/DashboardHomeLink";
-import { HomeOutlined, LogoutOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
+import { HomeOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useHR } from "../../components/HRContext";
 import NotificationBell from "../../components/NotificationBell";
-
-const { Title } = Typography;
+import "./TotalMasterDataPage.css";
+import DashboardHomeLink from "../../components/DashboardHomeLink";
 
 const RejectedDataPage = () => {
   const [rejectedData, setRejectedData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { hrName } = useHR();
+
+  // ✅ AntD v5 message hook
+  const { message } = App.useApp();
 
   useEffect(() => {
     const fetchRejectedData = async () => {
@@ -32,38 +34,24 @@ const RejectedDataPage = () => {
     fetchRejectedData();
   }, []);
 
+  const handleLogout = () => {
+    localStorage.clear();
+    message.success("Logout successfully");
+    window.location.href = "/login";
+  };
+
   const columns = [
-    {
-      title: "Candidate Name",
-      dataIndex: "candidate_name",
-      key: "candidate_name",
-    },
-    {
-      title: "Email",
-      dataIndex: "candidate_email_id",
-      key: "candidate_email_id",
-    },
-    {
-      title: "Position",
-      dataIndex: "position",
-      key: "position",
-    },
-    {
-      title: "Department",
-      dataIndex: "department",
-      key: "department",
-    },
+    { title: "Candidate Name", dataIndex: "candidate_name", key: "candidate_name" },
+    { title: "Email", dataIndex: "candidate_email_id", key: "candidate_email_id" },
+    { title: "Position", dataIndex: "position", key: "position" },
+    { title: "Department", dataIndex: "department", key: "department" },
     {
       title: "Status",
       dataIndex: "progress_status",
       key: "progress_status",
       render: (status) => <Tag color="red">{status}</Tag>,
     },
-    {
-      title: "Rejection Reason",
-      dataIndex: "rejection_reason",
-      key: "rejection_reason",
-    },
+    { title: "Rejection Reason", dataIndex: "rejection_reason", key: "rejection_reason" },
     {
       title: "Date",
       dataIndex: "status_date",
@@ -71,12 +59,6 @@ const RejectedDataPage = () => {
       render: (date) => new Date(date).toLocaleDateString(),
     },
   ];
-
-  const handleLogout = () => {
-    localStorage.clear();
-    message.success("Logout successfully");
-    window.location.href = "/login";
-  };
 
   return (
     <div className="total-master-data-container">
@@ -91,11 +73,10 @@ const RejectedDataPage = () => {
         <h2>Rejected Candidates</h2>
 
         <div className="header-right">
-          <NotificationBell/>
+          <NotificationBell />
           {hrName && hrName !== "HR" && (
             <span className="welcome-text">Welcome: {hrName}</span>
           )}
-
           <Button
             icon={<LogoutOutlined />}
             onClick={handleLogout}
@@ -108,11 +89,10 @@ const RejectedDataPage = () => {
           </Button>
         </div>
       </div>
-      <div style={{ padding: "20px" }}>
-        {/* <Title level={2}>Rejected Candidates</Title> */}
 
+      <div style={{ padding: "20px" }}>
         {loading ? (
-          <Spin size="large" />
+          <Spin size="large" style={{ display: "block", margin: "50px auto" }} />
         ) : error ? (
           <Alert message={error} type="error" />
         ) : (
@@ -121,6 +101,7 @@ const RejectedDataPage = () => {
             columns={columns}
             rowKey={(record) => record.id}
             bordered
+            pagination={{ pageSize: 10 }}
           />
         )}
       </div>

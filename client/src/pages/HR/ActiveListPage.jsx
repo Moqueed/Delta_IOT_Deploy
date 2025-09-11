@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, message, Spin } from "antd";
+import { Button, Spin, App } from "antd"; // ✅ Use App for message
 import axiosInstance from "../../api";
 import CandidateForm from "./CandidateForm";
 import "./ActiveList.css";
@@ -14,6 +14,9 @@ const ActiveList = () => {
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const { hrName } = useHR();
+
+  // ✅ AntD v5 message
+  const { message } = App.useApp();
 
   const fetchCandidates = async () => {
     setLoading(true);
@@ -64,7 +67,7 @@ const ActiveList = () => {
         <h2>Active List</h2>
 
         <div className="header-right">
-          <NotificationBell/>
+          <NotificationBell />
           <span className="welcome-text">Welcome: {hrName}</span>
           <Button
             icon={<LogoutOutlined />}
@@ -81,12 +84,11 @@ const ActiveList = () => {
 
       <div className="active-list-body">
         <div className="candidate-sidebar">
-          <h3>Active candidates List</h3>
+          <h3>Active Candidates List</h3>
           <ul className="candidate-list">
             {candidates.map((candidate) => (
               <div key={candidate.candidate_id} className="candidate-wrapper">
                 <li
-                  key={candidate.candidate_id}
                   className={`candidate-item ${
                     selectedCandidate?.candidate_id === candidate.candidate_id
                       ? "active"

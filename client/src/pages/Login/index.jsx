@@ -83,10 +83,13 @@ const LoginPage = () => {
               name="role"
               rules={[{ required: true, message: "Please select a role" }]}
             >
-              <Select placeholder="Select Role">
-                <Option value="HR">HR</Option>
-                <Option value="Admin">Admin</Option>
-              </Select>
+              <Select
+                placeholder="Select Role"
+                options={[
+                  { value: "HR", label: "HR" },
+                  { value: "Admin", label: "Admin" },
+                ]}
+              />
             </Form.Item>
 
             <Button type="primary" htmlType="submit" block loading={loading}>

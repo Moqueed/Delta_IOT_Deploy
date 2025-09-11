@@ -1,5 +1,6 @@
+// pages/TotalMasterDataPage.js
 import React, { useEffect, useState } from "react";
-import { Table, Spin, message, Button } from "antd";
+import { Table, Spin, Button, App } from "antd";
 import { fetchTotalMasterData } from "../../api/totalData";
 import "./TotalMasterDataPage.css";
 import { HomeOutlined, LogoutOutlined } from "@ant-design/icons";
@@ -12,6 +13,9 @@ const TotalMasterDataPage = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const { hrName } = useHR();
+
+  // ✅ AntD v5 message hook
+  const { message } = App.useApp();
 
   useEffect(() => {
     const loadData = async () => {
@@ -26,28 +30,16 @@ const TotalMasterDataPage = () => {
     };
 
     loadData();
-  }, []);
+  }, [message]);
 
   const columns = [
     { title: "HR Name", dataIndex: "HR_name", key: "HR_name" },
     { title: "HR Email", dataIndex: "HR_mail", key: "HR_mail" },
-    {
-      title: "Candidate Name",
-      dataIndex: "candidate_name",
-      key: "candidate_name",
-    },
-    {
-      title: "Email",
-      dataIndex: "candidate_email_id",
-      key: "candidate_email_id",
-    },
+    { title: "Candidate Name", dataIndex: "candidate_name", key: "candidate_name" },
+    { title: "Email", dataIndex: "candidate_email_id", key: "candidate_email_id" },
     { title: "Position", dataIndex: "position", key: "position" },
     { title: "Department", dataIndex: "department", key: "department" },
-    {
-      title: "Progress Status",
-      dataIndex: "progress_status",
-      key: "progress_status",
-    },
+    { title: "Progress Status", dataIndex: "progress_status", key: "progress_status" },
     { title: "Entry Date", dataIndex: "entry_date", key: "entry_date" },
     { title: "Status Date", dataIndex: "status_date", key: "status_date" },
   ];
@@ -60,6 +52,7 @@ const TotalMasterDataPage = () => {
 
   return (
     <div className="total-master-data-container">
+      {/* Header */}
       <div className="candidate-header">
         <div className="header-left">
           <img src="/images/hrms-logo.jpg" alt="logo" className="logo" />
@@ -71,7 +64,7 @@ const TotalMasterDataPage = () => {
         <h2>Total Master Data</h2>
 
         <div className="header-right">
-          <NotificationBell/>
+          <NotificationBell />
           <span className="welcome-text">Welcome: {hrName}</span>
           <Button
             icon={<LogoutOutlined />}
@@ -85,7 +78,8 @@ const TotalMasterDataPage = () => {
           </Button>
         </div>
       </div>
-      {/* <h2 className="page-title">Total Master Data</h2> */}
+
+      {/* Table */}
       {loading ? (
         <Spin size="large" className="loading-spinner" />
       ) : (
@@ -95,6 +89,7 @@ const TotalMasterDataPage = () => {
           dataSource={data}
           rowKey="candidate_email_id"
           pagination={{ pageSize: 8 }}
+          bordered
         />
       )}
     </div>

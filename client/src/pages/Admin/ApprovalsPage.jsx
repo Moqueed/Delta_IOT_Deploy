@@ -3,7 +3,6 @@ import {
   Form,
   Input,
   Button,
-  message,
   Popconfirm,
   Tag,
   Divider,
@@ -11,7 +10,7 @@ import {
   Col,
   Spin,
   Select,
-  Upload,
+  App,
 } from "antd";
 import {
   HomeOutlined,
@@ -25,7 +24,6 @@ import {
   updateApprovalById,
 } from "../../api/approval";
 import "./ApprovalsPage.css";
-import { Link } from "react-router-dom";
 import DashboardHomeLink from "../../components/DashboardHomeLink";
 import { uploadResumeToAll } from "../../api/upload";
 import { useAdmin } from "../../components/AdminContext";
@@ -36,7 +34,8 @@ const ApprovalsPage = () => {
   const [formStates, setFormStates] = useState({});
   const [loading, setLoading] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
-   const { adminName } = useAdmin();
+  const { adminName } = useAdmin();
+  const { message } = App.useApp(); // ✅ AntD v5
 
   const fetchApprovals = async () => {
     try {
@@ -97,9 +96,7 @@ const ApprovalsPage = () => {
     }
   };
 
-  const handleCandidateClick = (candidate) => {
-    setSelectedCandidate(candidate);
-  };
+  const handleCandidateClick = (candidate) => setSelectedCandidate(candidate);
 
   const handleReview = async (email, decision) => {
     try {
@@ -107,7 +104,7 @@ const ApprovalsPage = () => {
       message.success(`Candidate ${decision}`);
       fetchApprovals();
       setSelectedCandidate(null);
-    } catch (error) {
+    } catch {
       message.error("Failed to update status");
     }
   };
@@ -124,7 +121,7 @@ const ApprovalsPage = () => {
       message.success("Approval cancelled");
       fetchApprovals();
       setSelectedCandidate(null);
-    } catch (error) {
+    } catch {
       message.error("Failed to cancel approval");
     }
   };
@@ -135,18 +132,14 @@ const ApprovalsPage = () => {
       message.success("Approval updated successfully");
       fetchApprovals();
       setSelectedCandidate(null);
-    } catch (error) {
+    } catch {
       message.error("Failed to update approval");
     }
   };
 
   const getStatusTag = (status) => {
     const color =
-      status === "Approved"
-        ? "green"
-        : status === "Rejected"
-        ? "red"
-        : "orange";
+      status === "Approved" ? "green" : status === "Rejected" ? "red" : "orange";
     return <Tag color={color}>{status}</Tag>;
   };
 
@@ -238,19 +231,17 @@ const ApprovalsPage = () => {
           <img src="/images/hrms-logo.jpg" alt="logo" className="logo" />
           <DashboardHomeLink />
         </div>
-
         <h2>Approvals</h2>
-
         <div className="header-right">
-          <NotificationBell/>
-         <span className="welcome-text">Welcome: {adminName}</span>
+          <NotificationBell />
+          <span className="welcome-text">Welcome: {adminName}</span>
           <Button
             icon={<LogoutOutlined />}
             onClick={handleLogout}
             type="primary"
             danger
             size="small"
-            style={{ marginLeft: "15px" }}
+            style={{ marginLeft: 15 }}
           >
             Logout
           </Button>
@@ -297,19 +288,10 @@ const ApprovalsPage = () => {
                         <Select
                           value={formData[field.key]}
                           onChange={(value) =>
-                            handleFieldChange(
-                              candidateToShow.id,
-                              field.key,
-                              value
-                            )
+                            handleFieldChange(candidateToShow.id, field.key, value)
                           }
-                        >
-                          {field.options.map((opt) => (
-                            <Select.Option key={opt} value={opt}>
-                              {opt}
-                            </Select.Option>
-                          ))}
-                        </Select>
+                          options={field.options.map((opt) => ({ value: opt, label: opt }))}
+                        />
                       ) : field.type === "upload" ? (
                         <>
                           <input
@@ -318,10 +300,7 @@ const ApprovalsPage = () => {
                             onChange={(e) => {
                               const selectedFile = e.target.files[0];
                               if (selectedFile) {
-                                handleFileChange(
-                                  candidateToShow.id,
-                                  selectedFile
-                                );
+                                handleFileChange(candidateToShow.id, selectedFile);
                               }
                             }}
                           />
@@ -344,11 +323,7 @@ const ApprovalsPage = () => {
                         <Input
                           value={formData[field.key]}
                           onChange={(e) =>
-                            handleFieldChange(
-                              candidateToShow.id,
-                              field.key,
-                              e.target.value
-                            )
+                            handleFieldChange(candidateToShow.id, field.key, e.target.value)
                           }
                         />
                       )}
@@ -367,11 +342,7 @@ const ApprovalsPage = () => {
                     <Input.TextArea
                       value={formData.skills}
                       onChange={(e) =>
-                        handleFieldChange(
-                          candidateToShow.id,
-                          "skills",
-                          e.target.value
-                        )
+                        handleFieldChange(candidateToShow.id, "skills", e.target.value)
                       }
                       autoSize={{ minRows: 2 }}
                     />
@@ -383,11 +354,7 @@ const ApprovalsPage = () => {
                     <Input.TextArea
                       value={formData.comments}
                       onChange={(e) =>
-                        handleFieldChange(
-                          candidateToShow.id,
-                          "comments",
-                          e.target.value
-                        )
+                        handleFieldChange(candidateToShow.id, "comments", e.target.value)
                       }
                       autoSize={{ minRows: 2 }}
                     />
@@ -399,18 +366,14 @@ const ApprovalsPage = () => {
                 <Form.Item className="approval-actions">
                   <Button
                     type="primary"
-                    onClick={() =>
-                      handleReview(formData.candidate_email_id, "Approved")
-                    }
+                    onClick={() => handleReview(formData.candidate_email_id, "Approved")}
                     style={{ marginRight: 8 }}
                   >
                     Approve
                   </Button>
                   <Button
                     danger
-                    onClick={() =>
-                      handleReview(formData.candidate_email_id, "Rejected")
-                    }
+                    onClick={() => handleReview(formData.candidate_email_id, "Rejected")}
                     style={{ marginRight: 8 }}
                   >
                     Reject
@@ -425,10 +388,7 @@ const ApprovalsPage = () => {
                       Cancel
                     </Button>
                   </Popconfirm>
-                  <Button
-                    onClick={() => handleUpdate(candidateToShow.id)}
-                    type="default"
-                  >
+                  <Button onClick={() => handleUpdate(candidateToShow.id)} type="default">
                     Update
                   </Button>
                 </Form.Item>

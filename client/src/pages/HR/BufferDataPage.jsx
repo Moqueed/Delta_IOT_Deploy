@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Spin, message, Button } from "antd";
+import { Table, Spin, Button, App } from "antd"; // ✅ use App for message
 import { fetchBufferData } from "../../api/totalData";
 import DashboardHomeLink from "../../components/DashboardHomeLink";
 import { HomeOutlined, LoginOutlined } from "@ant-design/icons";
@@ -11,6 +11,9 @@ const BufferDataPage = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const { hrName } = useHR();
+
+  // ✅ AntD v5 message
+  const { message } = App.useApp();
 
   useEffect(() => {
     const loadData = async () => {
@@ -25,28 +28,16 @@ const BufferDataPage = () => {
     };
 
     loadData();
-  }, []);
+  }, [message]);
 
   const columns = [
     { title: "HR Name", dataIndex: "HR_name", key: "HR_name" },
     { title: "HR Email", dataIndex: "HR_mail", key: "HR_mail" },
-    {
-      title: "Candidate Name",
-      dataIndex: "candidate_name",
-      key: "candidate_name",
-    },
-    {
-      title: "Email",
-      dataIndex: "candidate_email_id",
-      key: "candidate_email_id",
-    },
+    { title: "Candidate Name", dataIndex: "candidate_name", key: "candidate_name" },
+    { title: "Email", dataIndex: "candidate_email_id", key: "candidate_email_id" },
     { title: "Position", dataIndex: "position", key: "position" },
     { title: "Department", dataIndex: "department", key: "department" },
-    {
-      title: "Progress Status",
-      dataIndex: "progress_status",
-      key: "progress_status",
-    },
+    { title: "Progress Status", dataIndex: "progress_status", key: "progress_status" },
     { title: "Entry Date", dataIndex: "entry_date", key: "entry_date" },
     { title: "Status Date", dataIndex: "status_date", key: "status_date" },
   ];
@@ -70,7 +61,7 @@ const BufferDataPage = () => {
         <h2>Buffer Data</h2>
 
         <div className="header-right">
-          <NotificationBell/>
+          <NotificationBell />
           <span className="welcome-text">Welcome: {hrName}</span>
           <Button
             icon={<LoginOutlined />}
@@ -85,18 +76,10 @@ const BufferDataPage = () => {
         </div>
       </div>
       <div style={{ padding: 24 }}>
-        {/* <h2 style={{ textAlign: "center" }}>Buffer Data</h2> */}
         {loading ? (
-          <Spin
-            size="large"
-            style={{ display: "block", margin: "50px auto" }}
-          />
+          <Spin size="large" style={{ display: "block", margin: "50px auto" }} />
         ) : (
-          <Table
-            columns={columns}
-            dataSource={data}
-            rowKey="candidate_email_id"
-          />
+          <Table columns={columns} dataSource={data} rowKey="candidate_email_id" />
         )}
       </div>
     </div>

@@ -4,7 +4,6 @@ import { Button, Input, Form, Select, message, Typography, Card } from "antd";
 import { RegisterUser } from "../../api/users";
 import "./RegisterPage.css"; // Import the CSS
 
-
 const { Option } = Select;
 const { Title, Text } = Typography;
 
@@ -15,7 +14,9 @@ const RegisterPage = () => {
     try {
       const response = await RegisterUser(values);
       if (response) {
-        message.success(`${values.role} registration successful! Redirecting to login...`);
+        message.success(
+          `${values.role} registration successful! Redirecting to login...`
+        );
         navigate("/login");
       }
     } catch (err) {
@@ -28,7 +29,9 @@ const RegisterPage = () => {
       {/* Left Form Section */}
       <div className="register-left">
         <Card className="register-card">
-          <Title level={2} className="register-title">Register</Title>
+          <Title level={2} className="register-title">
+            Register
+          </Title>
 
           <Form layout="vertical" onFinish={onFinish}>
             <Form.Item
@@ -42,7 +45,13 @@ const RegisterPage = () => {
             <Form.Item
               name="email"
               label={<Text strong>Email</Text>}
-              rules={[{ required: true, type: "email", message: "Enter a valid email" }]}
+              rules={[
+                {
+                  required: true,
+                  type: "email",
+                  message: "Enter a valid email",
+                },
+              ]}
             >
               <Input placeholder="Enter your email" />
             </Form.Item>
@@ -60,10 +69,13 @@ const RegisterPage = () => {
               label={<Text strong>Role</Text>}
               rules={[{ required: true, message: "Select a role" }]}
             >
-              <Select placeholder="Select Role">
-                <Option value="HR">HR</Option>
-                <Option value="Admin">Admin</Option>
-              </Select>
+              <Select
+                placeholder="Select Role"
+                options={[
+                  { value: "HR", label: "HR" },
+                  { value: "Admin", label: "Admin" },
+                ]}
+              />
             </Form.Item>
 
             <Button type="primary" htmlType="submit" block>
@@ -79,7 +91,11 @@ const RegisterPage = () => {
 
       {/* Right Image Section */}
       <div className="register-right">
-        <img src="/images/register-wallpaper.jpg" alt="HR Illustration" className="register-image" />
+        <img
+          src="/images/register-wallpaper.jpg"
+          alt="HR Illustration"
+          className="register-image"
+        />
       </div>
     </div>
   );

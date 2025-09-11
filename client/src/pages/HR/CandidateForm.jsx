@@ -5,9 +5,9 @@ import {
   Select,
   DatePicker,
   Button,
-  message,
   Row,
   Col,
+  App,
 } from "antd";
 import dayjs from "dayjs";
 import {
@@ -21,7 +21,7 @@ import {
   notifyManager,
   updateRejectedCandidate,
 } from "../../api/activeList";
-import { uploadResumeToAll } from "../../api/upload"; // Make sure this exists
+import { uploadResumeToAll } from "../../api/upload";
 import "./CandidateForm.css";
 
 const { Option } = Select;
@@ -30,6 +30,7 @@ const rejectedStatuses = ["rejected", "declined offer", "no show", "withdrawn"];
 
 const CandidateForm = ({ candidate, onUpdate }) => {
   const [form] = Form.useForm();
+  const { message } = App.useApp(); // ✅ AntD v5 way
   const [isRejected, setIsRejected] = useState(
     rejectedStatuses.includes(candidate.progress_status.toLowerCase())
   );
@@ -84,9 +85,7 @@ const CandidateForm = ({ candidate, onUpdate }) => {
       await UpdateTotalMasterData(candidate.candidate_id, status);
       await notifyManager(candidate.candidate_id, status);
 
-      message.success(
-        "Candidate marked as 'Yet to Share' and Manager notified"
-      );
+      message.success("Candidate marked as 'Yet to Share' and Manager notified");
       onUpdate();
     } catch (error) {
       console.error("Error notifying manager:", error);
@@ -103,20 +102,20 @@ const CandidateForm = ({ candidate, onUpdate }) => {
     "offer released": "Offer Released",
     "final discussion": "Final Discussion",
     "hr round cleared": "HR Round Cleared",
-    "joined": "Joined",
-    "hold": "Hold",
-    "buffer": "Buffer",
-    "yet to share": "Yet to Share", 
+    joined: "Joined",
+    hold: "Hold",
+    buffer: "Buffer",
+    "yet to share": "Yet to Share",
     "declined offer": "Declined Offer",
-    "rejected": "Rejected",
-    "no show" : "No show",
-    "withdrawn": "Withdrawn",
+    rejected: "Rejected",
+    "no show": "No Show",
+    withdrawn: "Withdrawn",
   };
 
   const handleSubmit = async (values) => {
     try {
       const status = values.progress_status?.toLowerCase().trim();
-      const originalStatus = statusMap[status]; // Get original casing
+      const originalStatus = statusMap[status];
 
       if (!originalStatus) {
         message.error("Invalid progress status");
@@ -162,8 +161,7 @@ const CandidateForm = ({ candidate, onUpdate }) => {
       } else if (["hold", "buffer"].includes(status)) {
         await updateBufferData(candidate.candidate_id, originalStatus);
         message.success("Candidate moved to Buffer Data");
-      }
-      else {
+      } else {
         await updateActiveList({
           ...values,
           progress_status: originalStatus,
@@ -242,10 +240,12 @@ const CandidateForm = ({ candidate, onUpdate }) => {
 
         <Col span={8}>
           <Form.Item name="profile_stage" label="Profile Stage">
-            <Select>
-              <Option value="Open">Open</Option>
-              <Option value="Closed">Closed</Option>
-            </Select>
+            <Select
+              options={[
+                { value: "Open", label: "Open" },
+                { value: "Closed", label: "Closed" },
+              ]}
+            />
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -293,13 +293,12 @@ const CandidateForm = ({ candidate, onUpdate }) => {
 
         <Col span={8}>
           <Form.Item name="band" label="Band">
-            <Select>
-              {["L0", "L1", "L2", "L3", "L4"].map((b) => (
-                <Option key={b} value={b}>
-                  {b}
-                </Option>
-              ))}
-            </Select>
+            <Select
+              options={["L0", "L1", "L2", "L3", "L4"].map((b) => ({
+                value: b,
+                label: b,
+              }))}
+            />
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -309,8 +308,8 @@ const CandidateForm = ({ candidate, onUpdate }) => {
         </Col>
         <Col span={8}>
           <Form.Item name="position" label="Position">
-            <Select>
-              {[
+            <Select
+              options={[
                 "Python Developer",
                 "EMD Developer",
                 "Intern",
@@ -318,37 +317,29 @@ const CandidateForm = ({ candidate, onUpdate }) => {
                 "C++ Developer",
                 "Accounts",
                 "Developer",
-              ].map((p) => (
-                <Option key={p} value={p}>
-                  {p}
-                </Option>
-              ))}
-            </Select>
+              ].map((p) => ({ value: p, label: p }))}
+            />
           </Form.Item>
         </Col>
 
         <Col span={8}>
           <Form.Item name="department" label="Department">
-            <Select>
-              {[
+            <Select
+              options={[
                 "IT",
                 "EMDB",
                 "Accounts",
                 "Financial",
                 "Python",
                 "Engineering",
-              ].map((d) => (
-                <Option key={d} value={d}>
-                  {d}
-                </Option>
-              ))}
-            </Select>
+              ].map((d) => ({ value: d, label: d }))}
+            />
           </Form.Item>
         </Col>
         <Col span={8}>
           <Form.Item name="progress_status" label="Progress Status">
-            <Select>
-              {[
+            <Select
+              options={[
                 "Application Received",
                 "Phone Screening",
                 "L1 Interview",
@@ -364,12 +355,8 @@ const CandidateForm = ({ candidate, onUpdate }) => {
                 "No Show",
                 "Buffer",
                 "Hold",
-              ].map((status) => (
-                <Option key={status} value={status}>
-                  {status}
-                </Option>
-              ))}
-            </Select>
+              ].map((status) => ({ value: status, label: status }))}
+            />
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -431,11 +418,7 @@ const CandidateForm = ({ candidate, onUpdate }) => {
             >
               Update
             </Button>
-            <Button
-              type="default"
-              onClick={handleReview}
-              className="review-btn"
-            >
+            <Button type="default" onClick={handleReview} className="review-btn">
               Request Review
             </Button>
             <Button

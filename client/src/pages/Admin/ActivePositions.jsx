@@ -1,5 +1,6 @@
+// pages/PositionForm.jsx
 import React, { useState, useEffect } from "react";
-import { Form, Input, InputNumber, Button, message, Select } from "antd";
+import { Form, Input, InputNumber, Button, Select, App } from "antd";
 import {
   createPosition,
   deletePosition,
@@ -8,7 +9,7 @@ import {
 } from "../../api/activePositions";
 import "./PositionForm.css";
 import { Link } from "react-router-dom";
-import { HomeOutlined, LogoutOutlined } from "@ant-design/icons";
+import { LogoutOutlined } from "@ant-design/icons";
 import DashboardHomeLink from "../../components/DashboardHomeLink";
 import { useAdmin } from "../../components/AdminContext";
 
@@ -18,19 +19,22 @@ const PositionForm = () => {
   const [form] = Form.useForm();
   const [positions, setPositions] = useState([]);
   const [selectedPosition, setSelectedPosition] = useState(null);
-   const { adminName } = useAdmin();
+  const { adminName } = useAdmin();
 
-  // ✅ Function to fetch and refresh positions
+  // ✅ AntD v5 message
+  const { message } = App.useApp();
+
+  // Fetch positions
   const refreshPositions = async () => {
     try {
       const data = await fetchPositions();
       setPositions(data);
     } catch (error) {
       console.error("Error refreshing positions:", error);
+      message.error("Failed to fetch positions");
     }
   };
 
-  // ✅ Fetch positions on initial load
   useEffect(() => {
     refreshPositions();
   }, []);
@@ -52,7 +56,6 @@ const PositionForm = () => {
         maximum_experience: Number(selectedPosition.maximum_experience) || 0,
         job_description: selectedPosition.job_description || "",
       };
-
       form.setFieldsValue(updatedPosition);
     } else {
       form.resetFields();
@@ -63,9 +66,7 @@ const PositionForm = () => {
     setSelectedPosition(pos);
     const updatedPosition = {
       ...pos,
-      skills: Array.isArray(pos.skills)
-        ? pos.skills.join(", ")
-        : pos.skills || "",
+      skills: Array.isArray(pos.skills) ? pos.skills.join(", ") : pos.skills || "",
       HRs: Array.isArray(pos.HRs) ? pos.HRs.join(", ") : pos.HRs || "",
     };
     form.setFieldsValue(updatedPosition);
@@ -78,7 +79,6 @@ const PositionForm = () => {
         skills: values.skills.split(",").map((s) => s.trim()),
         HRs: values.HRs.split(",").map((h) => h.trim()),
       };
-
       await createPosition(payload);
       message.success("Position added!");
       form.resetFields();
@@ -100,7 +100,6 @@ const PositionForm = () => {
       await updatePosition(selectedPosition.job_id, updated);
       message.success("Position updated!");
       refreshPositions();
-      fetchPositions().then((data) => setPositions(data));
     } catch (err) {
       console.error("Update error:", err);
       message.error("Failed to update position");
@@ -113,7 +112,6 @@ const PositionForm = () => {
       message.success("Position deleted!");
       form.resetFields();
       refreshPositions();
-      fetchPositions().then((data) => setPositions(data));
     } catch (err) {
       console.error("Delete error:", err);
       message.error("Failed to delete position");
@@ -128,10 +126,11 @@ const PositionForm = () => {
 
   return (
     <div className="position-form-container">
+      {/* Header */}
       <div className="position-header">
         <div className="header-left">
           <img src="/images/hrms-logo.jpg" alt="logo" className="logo" />
-          <DashboardHomeLink/>
+          <DashboardHomeLink />
         </div>
 
         <h2>Active Positions</h2>
@@ -151,6 +150,7 @@ const PositionForm = () => {
         </div>
       </div>
 
+      {/* Body */}
       <div className="position-body">
         <div className="position-list">
           <h3 className="position-list-title">Position List</h3>
@@ -184,21 +184,18 @@ const PositionForm = () => {
               className="form-item"
               rules={[{ required: true, message: "Position is required" }]}
             >
-              <Select placeholder="Select a position">
-                {[
-                  "Python Developer",
-                  "EMD Developer",
-                  "Intern",
-                  "Trainee",
-                  "C++ Developer",
-                  "Accounts",
-                  "Developer",
-                ].map((p) => (
-                  <Option key={p} value={p}>
-                    {p}
-                  </Option>
-                ))}
-              </Select>
+              <Select
+                placeholder="Select a position"
+                options={[
+                  { value: "Python Developer", label: "Python Developer" },
+                  { value: "EMD Developer", label: "EMD Developer" },
+                  { value: "Intern", label: "Intern" },
+                  { value: "Trainee", label: "Trainee" },
+                  { value: "C++ Developer", label: "C++ Developer" },
+                  { value: "Accounts", label: "Accounts" },
+                  { value: "Developer", label: "Developer" },
+                ]}
+              />
             </Form.Item>
 
             <Form.Item
@@ -216,29 +213,26 @@ const PositionForm = () => {
               className="form-item"
               rules={[{ required: true, message: "Department is required" }]}
             >
-              <Select placeholder="Select a department" showSearch allowClear>
-                {[
-                  "IT",
-                  "EMDB",
-                  "Accounts",
-                  "Financial",
-                  "Python",
-                  "Engineering",
-                ].map((dept) => (
-                  <Option key={dept} value={dept}>
-                    {dept}
-                  </Option>
-                ))}
-              </Select>
+              <Select
+                placeholder="Select a department"
+                showSearch
+                allowClear
+                options={[
+                  { value: "IT", label: "IT" },
+                  { value: "EMDB", label: "EMDB" },
+                  { value: "Accounts", label: "Accounts" },
+                  { value: "Financial", label: "Financial" },
+                  { value: "Python", label: "Python" },
+                  { value: "Engineering", label: "Engineering" },
+                ]}
+              />
             </Form.Item>
 
             <Form.Item
               label="Vacancies"
               name="vacancy"
               className="form-item"
-              rules={[
-                { required: true, message: "please enter number of vacancies" },
-              ]}
+              rules={[{ required: true, message: "please enter number of vacancies" }]}
             >
               <InputNumber min={0} style={{ width: "100%" }} />
             </Form.Item>
@@ -247,9 +241,7 @@ const PositionForm = () => {
               label="Minimum Experience (years)"
               name="minimum_experience"
               className="form-item"
-              rules={[
-                { required: true, message: "Minimum experience is required" },
-              ]}
+              rules={[{ required: true, message: "Minimum experience is required" }]}
             >
               <InputNumber min={0} style={{ width: "100%" }} />
             </Form.Item>
@@ -258,9 +250,7 @@ const PositionForm = () => {
               label="Maximum Experience (years)"
               name="maximum_experience"
               className="form-item"
-              rules={[
-                { required: true, message: "Maximum experience is required" },
-              ]}
+              rules={[{ required: true, message: "Maximum experience is required" }]}
             >
               <InputNumber min={0} style={{ width: "100%" }} />
             </Form.Item>
@@ -269,9 +259,7 @@ const PositionForm = () => {
               label="Job Description"
               name="job_description"
               className="form-item"
-              rules={[
-                { required: true, message: "Job Description is required" },
-              ]}
+              rules={[{ required: true, message: "Job Description is required" }]}
             >
               <Input.TextArea rows={3} />
             </Form.Item>

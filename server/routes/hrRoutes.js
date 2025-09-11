@@ -55,6 +55,25 @@ router.put("/update/:id", async (req, res) => {
 });
 
 
+// DELETE HR by ID
+router.delete("/:id", async (req, res) => {
+  const hrId = req.params.id;
+
+  try {
+    const hr = await HR.findByPk(hrId);
+    if (!hr) {
+      return res.status(404).json({ message: "HR not found" });
+    }
+
+    await hr.destroy();
+    return res.status(200).json({ message: "HR deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting HR:", error);
+    return res.status(500).json({ message: "Failed to delete HR", error: error.message });
+  }
+});
+
+
 module.exports = router;
 
 

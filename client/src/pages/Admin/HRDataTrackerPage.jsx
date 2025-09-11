@@ -9,6 +9,7 @@ import {
   message,
   Modal,
   Card,
+  Space,
 } from "antd";
 import moment from "moment";
 import {
@@ -35,7 +36,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 const HRDataTrackerPage = () => {
@@ -93,10 +93,7 @@ const HRDataTrackerPage = () => {
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Tracker Report");
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
     const data = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(data, "HR_Data_Tracker_Report.xlsx");
   };
@@ -127,14 +124,7 @@ const HRDataTrackerPage = () => {
     value: count,
   }));
 
-  const COLORS = [
-    "#0088FE",
-    "#00C49F",
-    "#FFBB28",
-    "#FF8042",
-    "#845EC2",
-    "#FF6F91",
-  ];
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#845EC2", "#FF6F91"];
 
   const allHRNames = [...new Set(trackerData.map((item) => item?.name))];
 
@@ -177,6 +167,7 @@ const HRDataTrackerPage = () => {
 
   return (
     <div className="tracker-container">
+      {/* Header */}
       <div className="tracker-header">
         <div className="header-left">
           <img src="/images/hrms-logo.jpg" alt="logo" className="logo" />
@@ -193,7 +184,7 @@ const HRDataTrackerPage = () => {
             type="primary"
             danger
             size="small"
-            style={{ marginLeft: "15px" }}
+            style={{ marginLeft: 15 }}
           >
             Logout
           </Button>
@@ -201,96 +192,64 @@ const HRDataTrackerPage = () => {
       </div>
 
       {/* Filters */}
-      <div className="tracker-filters">
-        <Row gutter={16} align="middle">
-          <Col>
-            <Select
-              placeholder="Status"
-              value={statusFilter}
-              onChange={(val) => setStatusFilter(val)}
-              style={{ width: 160 }}
-              allowClear
-            >
-              {STATUS_OPTIONS.map((status) => (
-                <Option key={status} value={status}>
-                  {status}
-                </Option>
-              ))}
-            </Select>
-          </Col>
+      <div className="tracker-filters" style={{ marginBottom: 20 }}>
+        <Space wrap size="middle">
+          <Select
+            placeholder="Status"
+            value={statusFilter}
+            onChange={setStatusFilter}
+            style={{ width: 180 }}
+            allowClear
+            options={STATUS_OPTIONS.map((status) => ({ label: status, value: status }))}
+          />
 
-          <Col>
-            <Select
-              placeholder="HR Name"
-              value={hrFilter}
-              onChange={(val) => setHrFilter(val)}
-              style={{ width: 200 }}
-              allowClear
-            >
-              {allHRNames.map((name) => (
-                <Option key={name} value={name}>
-                  {name}
-                </Option>
-              ))}
-            </Select>
-          </Col>
+          <Select
+            placeholder="HR Name"
+            value={hrFilter}
+            onChange={setHrFilter}
+            style={{ width: 180 }}
+            allowClear
+            options={allHRNames.map((name) => ({ label: name, value: name }))}
+          />
 
-          <Col>
-            <RangePicker
-              value={dateRange}
-              onChange={(dates) => setDateRange(dates)}
-              format="MM/DD/YYYY"
-            />
-          </Col>
+          <RangePicker
+            value={dateRange}
+            onChange={setDateRange}
+            format="MM/DD/YYYY"
+          />
 
-          <Col>
-            <Button type="primary" onClick={handleFilter}>
-              Apply Filter
-            </Button>
-          </Col>
-
-          <Col>
-            <Button onClick={clearFilters}>Clear Filter</Button>
-          </Col>
-
-          <Col>
-            <Button type="primary" onClick={handleExport}>
-              Export
-            </Button>
-          </Col>
-
-          <Col>
-            <Button type="primary" onClick={showAnalysis}>
-              <PieChartOutlined /> Analysis
-            </Button>
-          </Col>
-        </Row>
+          <Button type="primary" onClick={handleFilter}>Apply Filter</Button>
+          <Button onClick={clearFilters}>Clear Filter</Button>
+          <Button type="primary" onClick={handleExport}>Export</Button>
+          <Button
+            type="primary"
+            onClick={showAnalysis}
+            icon={<PieChartOutlined />}
+          >
+            Analysis
+          </Button>
+        </Space>
       </div>
 
-      {/* Summary Section */}
-      <div style={{ marginTop: 20 }}>
-        <Row gutter={16}>
-          <Col>
-            <Card title="Total Candidates" bordered>
-              <UserOutlined /> {filteredData.length}
-            </Card>
+      {/* Summary Cards */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
+        <Col>
+          <Card title="Total Candidates">
+            <UserOutlined /> {filteredData.length}
+          </Card>
+        </Col>
+        {Object.entries(statusCount).map(([status, count], idx) => (
+          <Col key={idx}>
+            <Card title={status}>{count}</Card>
           </Col>
-          {Object.entries(statusCount).map(([status, count], idx) => (
-            <Col key={idx}>
-              <Card title={status} bordered>
-                {count}
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </div>
+        ))}
+      </Row>
 
-      {/* Data Table */}
+      {/* Table */}
       <Table
         columns={columns}
         dataSource={filteredData}
         rowKey={(record) => record.id}
-        style={{ marginTop: 20 }}
         bordered
         pagination={{ pageSize: 10 }}
       />
@@ -298,7 +257,7 @@ const HRDataTrackerPage = () => {
       {/* Modal Analysis */}
       <Modal
         title="Candidate Status Analysis"
-        open={isModalVisible}
+        open={isModalVisible} // v5
         onCancel={closeAnalysis}
         footer={null}
         width={700}
@@ -315,10 +274,7 @@ const HRDataTrackerPage = () => {
               label
             >
               {pieData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
             <Tooltip />

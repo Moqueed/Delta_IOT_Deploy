@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { deleteVacancy } from "../../api/hrVacancy";
-import { Button, message, Popconfirm, Spin, Table } from "antd";
-import { HomeOutlined, LogoutOutlined } from "@ant-design/icons";
+import { Button, Popconfirm, Spin, Table, App } from "antd"; // ✅ import App
+import { LogoutOutlined } from "@ant-design/icons";
 import "./HRVacancy.css";
 import DashboardHomeLink from "../../components/DashboardHomeLink";
 import axiosInstance from "../../api";
@@ -12,35 +12,30 @@ import NotificationBell from "../../components/NotificationBell";
 const HRVacancy = () => {
   const [vacancies, setVacancies] = useState([]);
   const [loading, setLoading] = useState(true);
-  // const [vacanciesList, setVacanciesList] = useState([]);
   const navigate = useNavigate();
   const { hrName } = useHR();
 
+  // ✅ AntD v5 message hook
+  const { message } = App.useApp();
+
   const fetchVacancies = async () => {
-  try {
-    setLoading(true);
-
-    const email = localStorage.getItem("userEmail");
-    console.log("📧 Fetched email from localStorage:", email);
-
-    if (!email) {
-      message.error("No email found in localStorage.");
-      return;
+    try {
+      setLoading(true);
+      const email = localStorage.getItem("userEmail");
+      if (!email) {
+        message.error("No email found in localStorage.");
+        return;
+      }
+      const res = await axiosInstance.get(`/api/hrvacancies/by-email/${email}`);
+      const data = res.data;
+      setVacancies(data);
+    } catch (error) {
+      console.error("❌ Error fetching vacancies:", error);
+      message.error("Failed to load vacancies");
+    } finally {
+      setLoading(false);
     }
-
-    const res = await axiosInstance.get(`/api/hrvacancies/by-email/${email}`);
-    const data = res.data;
-    console.log("✅ Vacancies:", data);
-
-    setVacancies(data);
-  } catch (error) {
-    console.error("❌ Error fetching vacancies:", error);
-    message.error("Failed to load vacancies");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   useEffect(() => {
     fetchVacancies();
@@ -55,6 +50,7 @@ const HRVacancy = () => {
       message.error("Failed to delete vacancy");
     }
   };
+
   const handleLogout = () => {
     localStorage.clear();
     message.success("Logout successfully");
@@ -76,18 +72,15 @@ const HRVacancy = () => {
       title: "Skills",
       dataIndex: "skills",
       key: "skills",
-      render: (skills) => (
-        <>
-          {Array.isArray(skills)
-            ? skills.map((skill, index) => (
-                <span key={index}>
-                  {skill}
-                  {index < skills.length - 1 && ", "}
-                </span>
-              ))
-            : skills}
-        </>
-      ),
+      render: (skills) =>
+        Array.isArray(skills)
+          ? skills.map((skill, index) => (
+              <span key={index}>
+                {skill}
+                {index < skills.length - 1 && ", "}
+              </span>
+            ))
+          : skills,
     },
     {
       title: "Job Description",
@@ -98,44 +91,16 @@ const HRVacancy = () => {
       title: "HRs",
       dataIndex: "HRs",
       key: "HRs",
-      render: (HRs) => (
-        <>
-          {Array.isArray(HRs)
-            ? HRs.map((hr, index) => (
-                <span key={index}>
-                  {hr}
-                  {index < HRs.length - 1 && ", "}
-                </span>
-              ))
-            : HRs}
-        </>
-      ),
+      render: (HRs) =>
+        Array.isArray(HRs)
+          ? HRs.map((hr, index) => (
+              <span key={index}>
+                {hr}
+                {index < HRs.length - 1 && ", "}
+              </span>
+            ))
+          : HRs,
     },
-
-    // {
-    //   title: "Actions",
-    //   key: "actions",
-    //   render: (_, record) => (
-    //     <>
-    //       <Button
-    //         type="link"
-    //         onClick={() => console.log("View Details:", record.job_id)}
-    //       >
-    //         View
-    //       </Button>
-    //       <Popconfirm
-    //         title="Are you sure you want to delete this vacancy?"
-    //         onConfirm={() => handleDelete(record.job_id)}
-    //         okText="Yes"
-    //         cancelText="No"
-    //       >
-    //         <Button type="link" danger>
-    //           Delete
-    //         </Button>
-    //       </Popconfirm>
-    //     </>
-    //   ),
-    // },
   ];
 
   return (
@@ -149,8 +114,8 @@ const HRVacancy = () => {
           <h2 className="header-title">HR Vacancies</h2>
         </div>
         <div className="header-right">
-        <NotificationBell/>
-           <span className="welcome-text">Welcome: {hrName}</span>
+          <NotificationBell />
+          <span className="welcome-text">Welcome: {hrName}</span>
           <Button
             icon={<LogoutOutlined />}
             onClick={handleLogout}
@@ -165,7 +130,6 @@ const HRVacancy = () => {
       </div>
 
       <div className="table-container">
-        {/* <h2>Vacancies</h2> */}
         {loading ? (
           <Spin size="large" />
         ) : (

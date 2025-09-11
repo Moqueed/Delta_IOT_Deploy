@@ -29,3 +29,13 @@ export const saveUpdateHR = async (id, data) => {
     throw error;
   }
 };
+
+export const deleteHR = async (id) => {
+  try {
+    const res = await axiosInstance.delete(`/hr/${id}`);
+    return res.data;
+  } catch (error) {
+    console.error("Failed to delete HR:", error);
+    throw error;
+  }
+};

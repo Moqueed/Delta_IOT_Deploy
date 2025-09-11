@@ -1,5 +1,6 @@
+// pages/TotalDataPage.js
 import React from "react";
-import { Button, Card, message, Typography } from "antd";
+import { Card, Button, App } from "antd";
 import {
   DatabaseOutlined,
   UserAddOutlined,
@@ -7,63 +8,57 @@ import {
   ClockCircleOutlined,
   CloseCircleOutlined,
   LogoutOutlined,
-  HomeOutlined,
 } from "@ant-design/icons";
-import { Link, useNavigate } from "react-router-dom";
-import "./TotalDataPage.css";
+import { useNavigate } from "react-router-dom";
 import DashboardHomeLink from "../../components/DashboardHomeLink";
 import { useHR } from "../../components/HRContext";
-
-
-const { Title } = Typography;
+import "./TotalDataPage.css";
 
 const TotalDataPage = () => {
   const { hrName } = useHR();
+  const navigate = useNavigate();
+
+  // ✅ AntD v5 message hook
+  const { message } = App.useApp();
+
   const sections = [
     {
       title: "Total Master Data",
       color: "bg-lightblue",
       icon: <DatabaseOutlined className="section-icon blue" />,
+      route: "/total-data/total-master-data",
     },
     {
       title: "Newly Joined",
       color: "bg-lightgreen",
       icon: <UserAddOutlined className="section-icon green" />,
+      route: "/total-data/newly-joined",
     },
     {
       title: "About to Join",
       color: "bg-lightyellow",
       icon: <CalendarOutlined className="section-icon orange" />,
+      route: "/total-data/about-to-join",
     },
     {
       title: "Buffer Data",
       color: "bg-lightpurple",
       icon: <ClockCircleOutlined className="section-icon purple" />,
+      route: "/total-data/buffer-data",
     },
     {
       title: "Rejected Data",
       color: "bg-lightpink",
       icon: <CloseCircleOutlined className="section-icon red" />,
+      route: "/total-data/rejected-data",
     },
   ];
 
-  const navigate = useNavigate();
-
-  const handleCardClick = (section) => {
-    if (section.title === "Rejected Data") {
-      navigate("/total-data/rejected-data");
-    } else if (section.title === "Total Master Data") {
-      navigate("/total-data/total-master-data");
-    } else if (section.title === "About to Join") {
-      navigate("/total-data/about-to-join");
-    } else if (section.title === "Newly Joined") {
-      navigate("/total-data/newly-joined");
-    } else if (section.title === "Buffer Data") {
-      navigate("/total-data/buffer-data");
-    }
+  const handleCardClick = (route) => {
+    navigate(route);
   };
 
-    const handleLogout = () => {
+  const handleLogout = () => {
     localStorage.clear();
     message.success("Logout successfully");
     window.location.href = "/login";
@@ -71,10 +66,11 @@ const TotalDataPage = () => {
 
   return (
     <div className="total-data-page">
+      {/* Header */}
       <div className="total-page-header">
         <div className="header-left">
           <img src="/images/hrms-logo.jpg" alt="logo" className="logo" />
-          <DashboardHomeLink/>
+          <DashboardHomeLink />
         </div>
 
         <h2>Total Data</h2>
@@ -93,9 +89,8 @@ const TotalDataPage = () => {
           </Button>
         </div>
       </div>
-      {/* <Title level={1} className="page-title">
-        Total Data
-      </Title> */}
+
+      {/* Cards Grid */}
       <div className="card-grid">
         {sections.map((section, index) => (
           <Card
@@ -103,13 +98,8 @@ const TotalDataPage = () => {
             className={`data-card ${section.color} ${
               index === 2 ? "wide-card" : ""
             }`}
-            onClick={() => handleCardClick(section)}
-            onMouseEnter={(e) => {
-              e.currentTarget.classList.add("hovered");
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.classList.remove("hovered");
-            }}
+            onClick={() => handleCardClick(section.route)}
+            hoverable
           >
             {section.icon}
             <div className="card-title">{section.title}</div>

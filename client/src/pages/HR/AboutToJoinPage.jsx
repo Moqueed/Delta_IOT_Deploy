@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Table, Spin, message, Button } from "antd";
+import { Table, Spin, Button, App } from "antd";
 import { fetchAboutToJoin } from "../../api/totalData";
-import DashboardHomeLink from "../../components/DashboardHomeLink";
 import { HomeOutlined, LogoutOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { useHR } from "../../components/HRContext";
 import NotificationBell from "../../components/NotificationBell";
 
-
 const AboutToJoinPage = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const { hrName } = useHR();
+  const { message } = App.useApp(); // ✅ AntD v5 way
 
   useEffect(() => {
     const loadData = async () => {
@@ -26,7 +25,7 @@ const AboutToJoinPage = () => {
     };
 
     loadData();
-  }, []);
+  }, [message]);
 
   const columns = [
     { title: "HR Name", dataIndex: "HR_name", key: "HR_name" },
@@ -38,29 +37,28 @@ const AboutToJoinPage = () => {
     { title: "Progress Status", dataIndex: "progress_status", key: "progress_status" },
     { title: "Entry Date", dataIndex: "entry_date", key: "entry_date" },
     { title: "Status Date", dataIndex: "status_date", key: "status_date" },
-    
   ];
 
-   const handleLogout = () => {
-      localStorage.clear();
-      message.success("Logout successfully");
-      window.location.href = "/login";
-    };
+  const handleLogout = () => {
+    localStorage.clear();
+    message.success("Logout successfully");
+    window.location.href = "/login";
+  };
 
   return (
     <div className="total-master-data-container">
       <div className="candidate-header">
         <div className="header-left">
-         <img src="/images/hrms-logo.jpg" alt="logo" className="logo" />
+          <img src="/images/hrms-logo.jpg" alt="logo" className="logo" />
           <Link to="/total-data">
-            <HomeOutlined className="home-icon" style={{ fontSize: "24px" }} />
+            <HomeOutlined className="home-icon" style={{ fontSize: 24 }} />
           </Link>
         </div>
 
         <h2>About to Join</h2>
 
         <div className="header-right">
-          <NotificationBell/>
+          <NotificationBell />
           <span className="welcome-text">Welcome: {hrName}</span>
           <Button
             icon={<LogoutOutlined />}
@@ -68,20 +66,20 @@ const AboutToJoinPage = () => {
             type="primary"
             danger
             size="small"
-            style={{ marginLeft: "15px" }}
+            style={{ marginLeft: 15 }}
           >
             Logout
           </Button>
         </div>
       </div>
-    <div style={{ padding: 24 }}>
-      {/* <h2 style={{ textAlign: "center" }}>About To Join</h2> */}
-      {loading ? (
-        <Spin size="large" style={{ display: "block", margin: "50px auto" }} />
-      ) : (
-        <Table columns={columns} dataSource={data} rowKey="candidate_email_id" />
-      )}
-    </div>
+
+      <div style={{ padding: 24 }}>
+        {loading ? (
+          <Spin size="large" style={{ display: "block", margin: "50px auto" }} />
+        ) : (
+          <Table columns={columns} dataSource={data} rowKey="candidate_email_id" />
+        )}
+      </div>
     </div>
   );
 };

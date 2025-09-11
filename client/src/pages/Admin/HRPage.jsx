@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, List, Avatar, Card, message } from "antd";
-import { addHR, getHRS, saveUpdateHR } from "../../api/hrApi";
+import { Form, Input, Button, List, Avatar, Card, message, Space } from "antd";
+import { addHR, deleteHR, getHRS, saveUpdateHR } from "../../api/hrApi";
 import "./HRPage.css";
 import { HomeOutlined, LogoutOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
@@ -15,11 +15,6 @@ const HRListPage = () => {
   const loadHRs = async () => {
     try {
       const res = await getHRS();
-
-      console.log("Fetched HRs:", res);
-
-      console.log("Type of res", typeof res);
-      console.log("Is array?", Array.isArray(res));
       setHrList(res);
     } catch (err) {
       message.error("Failed to fetch HRs");
@@ -49,11 +44,11 @@ const HRListPage = () => {
     }
   };
 
-    const handleLogout = () => {
-      localStorage.clear();
-      message.success("Logout successfully");
-      window.location.href = "/login";
-    }
+  const handleLogout = () => {
+    localStorage.clear();
+    message.success("Logout successfully");
+    window.location.href = "/login";
+  };
 
   const handleSave = async () => {
     try {
@@ -78,7 +73,7 @@ const HRListPage = () => {
       return;
     }
     try {
-      await deleteHR(selectedHR.id); // Assuming deleteHR API exists
+      await deleteHR(selectedHR.id);
       message.success("HR deleted successfully");
       form.resetFields();
       setSelectedHR(null);
@@ -89,7 +84,8 @@ const HRListPage = () => {
   };
 
   return (
-    <div>
+    <div className="hr-page-container">
+      {/* Header */}
       <div className="hr-header">
         <div className="header-left">
           <img src="/images/hrms-logo.jpg" alt="logo" className="logo" />
@@ -98,24 +94,26 @@ const HRListPage = () => {
           </Link>
         </div>
 
-            <h2>HR's List</h2>
+        <h2>HR's List</h2>
 
         <div className="header-right">
-           <span className="welcome-text">Welcome: {adminName}</span>
+          <span className="welcome-text">Welcome: {adminName}</span>
           <Button
-            icon={<LogoutOutlined/>}
+            icon={<LogoutOutlined />}
             onClick={handleLogout}
             type="primary"
             danger
             size="small"
-            style={{ marginLeft: "15px"}}
-        >
+            style={{ marginLeft: 15 }}
+          >
             Logout
-        </Button>
+          </Button>
         </div>
       </div>
 
+      {/* Main Container */}
       <div className="main-container">
+        {/* Sidebar List */}
         <div className="hr-sidebar">
           <List
             itemLayout="horizontal"
@@ -123,8 +121,14 @@ const HRListPage = () => {
             locale={{ emptyText: "No HRs Available" }}
             renderItem={(item) => (
               <List.Item
-                className="hr-list-item"
                 onClick={() => handleSelect(item)}
+                style={{
+                  cursor: "pointer",
+                  background: selectedHR?.id === item.id ? "#f5f5f5" : "transparent",
+                  padding: "8px 16px",
+                  borderRadius: 4,
+                  marginBottom: 4,
+                }}
               >
                 <List.Item.Meta
                   avatar={<Avatar>{item.name?.[0]?.toUpperCase()}</Avatar>}
@@ -138,20 +142,25 @@ const HRListPage = () => {
             type="primary"
             danger
             block
-            className="delete-button"
+            style={{ marginTop: 10 }}
             onClick={handleDelete}
           >
             Delete
           </Button>
         </div>
 
+        {/* Form Section */}
         <div className="form-section">
-          {/* <h2 className="form-title">HR'S List</h2> */}
           <Card className="container-card">
             <Form form={form} className="hr-form" layout="vertical">
-              <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+              <Form.Item
+                name="name"
+                label="Name"
+                rules={[{ required: true, message: "Please enter name" }]}
+              >
                 <Input />
               </Form.Item>
+
               <Form.Item
                 name="email"
                 label="Email"
@@ -162,35 +171,44 @@ const HRListPage = () => {
               >
                 <Input />
               </Form.Item>
+
               <Form.Item
                 name="contact_number"
                 label="Contact Number"
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: "Please enter contact number" }]}
               >
                 <Input />
               </Form.Item>
-              <Form.Item name="role" label="Role" rules={[{ required: true }]}>
+
+              <Form.Item
+                name="role"
+                label="Role"
+                rules={[{ required: true, message: "Please enter role" }]}
+              >
                 <Input />
               </Form.Item>
             </Form>
           </Card>
         </div>
 
+        {/* Button Panel */}
         <div className="button-panel">
-          <Button type="primary" danger onClick={handleAddNew}>
-            Add
-          </Button>
-          <Button
-            type="default"
-            disabled={!selectedHR}
-            onClick={() => form.setFieldsValue(selectedHR)}
-          >
-            Edit
-          </Button>
-          <Button type="primary" onClick={handleSave}>
-            update
-          </Button>
-          <Button onClick={() => form.resetFields()}>Cancel</Button>
+          <Space wrap size="middle">
+            <Button type="primary" danger onClick={handleAddNew}>
+              Add
+            </Button>
+            <Button
+              type="default"
+              disabled={!selectedHR}
+              onClick={() => form.setFieldsValue(selectedHR)}
+            >
+              Edit
+            </Button>
+            <Button type="primary" onClick={handleSave}>
+              Update
+            </Button>
+            <Button onClick={() => form.resetFields()}>Cancel</Button>
+          </Space>
         </div>
       </div>
     </div>
