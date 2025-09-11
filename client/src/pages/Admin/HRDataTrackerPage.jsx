@@ -37,8 +37,89 @@ const HRDataTrackerPage = () => {
   const [statusFilter, setStatusFilter] = useState(null);
   const [hrFilter, setHrFilter] = useState(null);
   const [dateRange, setDateRange] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const { adminName } = useAdmin();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  // Utility to make sure we always have arrays
+  const safeArray = (data) => (Array.isArray(data) ? data : []);
+
+  useEffect(() => {
+    fetchTrackerData();
+  }, []);
+
+  const fetchTrackerData = async () => {
+    try {
+      const data = safeArray(await getHRDataEntries());
+      const result = safeArray(await fetchFilteredTrackerFromActiveList({}));
+      setTrackerData(data);
+      setFilteredData(result);
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to load HR Data Tracker");
+    }
+  };
+
+  const handleFilter = async () => {
+    try {
+      const filters = {
+        status: statusFilter,
+        hr_name: hrFilter,
+        startDate: dateRange?.[0]?.format("YYYY-MM-DD"),
+        endDate: dateRange?.[1]?.format("YYYY-MM-DD"),
+      };
+      const result = safeArray(await fetchFilteredTrackerFromActiveList(filters));
+      setFilteredData(result);
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to apply filters");
+    }
+  };
+
+  const handleExport = () => {
+    const exportData = safeArray(filteredData).map((item) => ({
+      "HR Name": item.HR_name || "",
+      "Candidate Name": item.candidate_name || "",
+      Position: item.position || "",
+      Status: item.progress_status || "",
+      "Status Date": item.status_date ? moment(item.status_date).format("DD/MM/YYYY") : "",
+      "Entry Date": item.entry_date ? moment(item.entry_date).format("DD/MM/YYYY") : "",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Tracker Report");
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(data, "HR_Data_Tracker_Report.xlsx");
+  };
+
+  const clearFilters = () => {
+    setStatusFilter(null);
+    setHrFilter(null);
+    setDateRange([]);
+    setFilteredData(trackerData);
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    message.success("Logout successfully");
+    window.location.href = "/login";
+  };
+
+  const showAnalysis = () => setIsModalVisible(true);
+  const closeAnalysis = () => setIsModalVisible(false);
+
+  const statusCount = safeArray(filteredData).reduce((acc, item) => {
+    const status = item.progress_status || "Unknown";
+    acc[status] = (acc[status] || 0) + 1;
+    return acc;
+  }, {});
+
+  const pieData = Object.entries(statusCount).map(([name, value]) => ({ name, value }));
+
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#845EC2", "#FF6F91"];
+
+  const allHRNames = [...new Set(safeArray(trackerData).map((item) => item?.name).filter(Boolean))];
 
   const STATUS_OPTIONS = [
     "Application Received",
@@ -57,96 +138,6 @@ const HRDataTrackerPage = () => {
     "Buffer",
     "Hold",
   ];
-
-  const COLORS = [
-    "#0088FE",
-    "#00C49F",
-    "#FFBB28",
-    "#FF8042",
-    "#845EC2",
-    "#FF6F91",
-  ];
-
-  useEffect(() => {
-    fetchTrackerData();
-  }, []);
-
-  const fetchTrackerData = async () => {
-    try {
-      const data = await getHRDataEntries();
-      const result = await fetchFilteredTrackerFromActiveList({});
-      setTrackerData(Array.isArray(data) ? data : []);
-      setFilteredData(Array.isArray(result) ? result : []);
-    } catch (error) {
-      console.error(error);
-      message.error("Failed to load HR Data Tracker");
-    }
-  };
-
-  const handleFilter = async () => {
-    try {
-      const filters = {
-        status: statusFilter,
-        hr_name: hrFilter,
-        startDate: dateRange?.[0]?.format("YYYY-MM-DD"),
-        endDate: dateRange?.[1]?.format("YYYY-MM-DD"),
-      };
-      const result = await fetchFilteredTrackerFromActiveList(filters);
-      setFilteredData(Array.isArray(result) ? result : []);
-    } catch (error) {
-      console.error(error);
-      message.error("Failed to apply filters");
-    }
-  };
-
-  const handleExport = () => {
-    const exportData = (filteredData || []).map((item) => ({
-      "HR Name": item.HR_name,
-      "Candidate Name": item.candidate_name,
-      Position: item.position,
-      Status: item.progress_status,
-      "Status Date": item.status_date
-        ? moment(item.status_date).format("DD/MM/YYYY")
-        : "",
-      "Entry Date": item.entry_date
-        ? moment(item.entry_date).format("DD/MM/YYYY")
-        : "",
-    }));
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Tracker Report");
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(data, "HR_Data_Tracker_Report.xlsx");
-  };
-
-  const clearFilters = () => {
-    setStatusFilter(null);
-    setHrFilter(null);
-    setDateRange([]);
-    setFilteredData(Array.isArray(trackerData) ? trackerData : []);
-  };
-
-  const handleLogout = () => {
-    localStorage.clear();
-    message.success("Logout successfully");
-    window.location.href = "/login";
-  };
-
-  const showAnalysis = () => setIsModalVisible(true);
-  const closeAnalysis = () => setIsModalVisible(false);
-
-  // Prepare data for charts
-  const statusCount = (filteredData || []).reduce((acc, item) => {
-    acc[item.progress_status] = (acc[item.progress_status] || 0) + 1;
-    return acc;
-  }, {});
-
-  const pieData = Object.entries(statusCount).map(([name, value]) => ({ name, value }));
-
-  const allHRNames = Array.isArray(trackerData)
-    ? [...new Set(trackerData.map((item) => item?.name).filter(Boolean))]
-    : [];
 
   const columns = [
     { title: "HR Name", dataIndex: "HR_name", key: "HR_name" },
@@ -202,7 +193,7 @@ const HRDataTrackerPage = () => {
             onChange={setStatusFilter}
             style={{ width: 180 }}
             allowClear
-            options={STATUS_OPTIONS.map((status) => ({ label: status, value: status }))}
+            options={safeArray(STATUS_OPTIONS).map((status) => ({ label: status, value: status }))}
           />
 
           <Select
@@ -211,10 +202,14 @@ const HRDataTrackerPage = () => {
             onChange={setHrFilter}
             style={{ width: 180 }}
             allowClear
-            options={allHRNames.map((name) => ({ label: name, value: name }))}
+            options={safeArray(allHRNames).map((name) => ({ label: name, value: name }))}
           />
 
-          <RangePicker value={dateRange} onChange={setDateRange} format="MM/DD/YYYY" />
+          <RangePicker
+            value={dateRange}
+            onChange={setDateRange}
+            format="MM/DD/YYYY"
+          />
 
           <Button type="primary" onClick={handleFilter}>
             Apply Filter
@@ -223,7 +218,11 @@ const HRDataTrackerPage = () => {
           <Button type="primary" onClick={handleExport}>
             Export
           </Button>
-          <Button type="primary" onClick={showAnalysis} icon={<PieChartOutlined />}>
+          <Button
+            type="primary"
+            onClick={showAnalysis}
+            icon={<PieChartOutlined />}
+          >
             Analysis
           </Button>
         </Space>
@@ -233,7 +232,7 @@ const HRDataTrackerPage = () => {
       <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
         <Col>
           <Card title="Total Candidates">
-            <UserOutlined /> {filteredData.length}
+            <UserOutlined /> {safeArray(filteredData).length}
           </Card>
         </Col>
         {Object.entries(statusCount).map(([status, count], idx) => (
@@ -246,8 +245,8 @@ const HRDataTrackerPage = () => {
       {/* Table */}
       <Table
         columns={columns}
-        dataSource={Array.isArray(filteredData) ? filteredData : []}
-        rowKey={(record) => record.id}
+        dataSource={safeArray(filteredData)}
+        rowKey={(record) => record.id || Math.random()}
         bordered
         pagination={{ pageSize: 10 }}
       />
@@ -262,7 +261,15 @@ const HRDataTrackerPage = () => {
       >
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
-            <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+            <Pie
+              data={pieData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={100}
+              label
+            >
               {pieData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}

@@ -15,6 +15,7 @@ const HRListPage = () => {
   const loadHRs = async () => {
     try {
       const res = await getHRS();
+      // Ensure res is always an array
       setHrList(Array.isArray(res) ? res : []);
     } catch (err) {
       message.error("Failed to fetch HRs");
@@ -28,9 +29,7 @@ const HRListPage = () => {
 
   const handleSelect = (hr) => {
     setSelectedHR(hr);
-    if (hr && typeof hr === "object") {
-      form.setFieldsValue(hr);
-    }
+    form.setFieldsValue(hr);
   };
 
   const handleAddNew = async () => {
@@ -41,27 +40,25 @@ const HRListPage = () => {
       form.resetFields();
       setSelectedHR(null);
       loadHRs();
-    } catch (err) {
+    } catch {
       message.error("Failed to add HR");
-      console.error(err);
     }
   };
 
   const handleSave = async () => {
-    if (!selectedHR) {
-      message.warning("No HR selected for update.");
-      return;
-    }
     try {
       const values = await form.validateFields();
-      await saveUpdateHR(selectedHR.id, values);
-      message.success("HR updated successfully");
-      form.resetFields();
-      setSelectedHR(null);
-      loadHRs();
-    } catch (err) {
-      message.error("Failed to update HR");
-      console.error(err);
+      if (selectedHR) {
+        await saveUpdateHR(selectedHR.id, values);
+        message.success("HR updated successfully");
+        form.resetFields();
+        setSelectedHR(null);
+        loadHRs();
+      } else {
+        message.warning("No HR selected for update.");
+      }
+    } catch {
+      message.error("Failed to save HR");
     }
   };
 
@@ -76,9 +73,8 @@ const HRListPage = () => {
       form.resetFields();
       setSelectedHR(null);
       loadHRs();
-    } catch (err) {
+    } catch {
       message.error("Failed to delete HR");
-      console.error(err);
     }
   };
 
@@ -98,9 +94,7 @@ const HRListPage = () => {
             <HomeOutlined className="home-icon" />
           </Link>
         </div>
-
         <h2>HR's List</h2>
-
         <div className="header-right">
           <span className="welcome-text">Welcome: {adminName}</span>
           <Button
@@ -122,23 +116,28 @@ const HRListPage = () => {
         <div className="hr-sidebar">
           <List
             itemLayout="horizontal"
-            dataSource={Array.isArray(hrList) ? hrList : []}
+            dataSource={Array.isArray(hrList) ? hrList : []} // safe
             locale={{ emptyText: "No HRs Available" }}
             renderItem={(item) => (
               <List.Item
                 onClick={() => handleSelect(item)}
                 style={{
                   cursor: "pointer",
-                  background: selectedHR?.id === item.id ? "#f5f5f5" : "transparent",
+                  background:
+                    selectedHR?.id === item.id ? "#f5f5f5" : "transparent",
                   padding: "8px 16px",
                   borderRadius: 4,
                   marginBottom: 4,
                 }}
               >
                 <List.Item.Meta
-                  avatar={<Avatar>{item.name?.[0]?.toUpperCase() ?? "H"}</Avatar>}
-                  title={<strong>{item.name ?? "Unknown"}</strong>}
-                  description={item.email ?? ""}
+                  avatar={
+                    <Avatar>
+                      {item.name && item.name[0] ? item.name[0].toUpperCase() : ""}
+                    </Avatar>
+                  }
+                  title={<strong>{item.name || "No Name"}</strong>}
+                  description={item.email || "No Email"}
                 />
               </List.Item>
             )}
@@ -165,7 +164,6 @@ const HRListPage = () => {
               >
                 <Input />
               </Form.Item>
-
               <Form.Item
                 name="email"
                 label="Email"
@@ -176,15 +174,15 @@ const HRListPage = () => {
               >
                 <Input />
               </Form.Item>
-
               <Form.Item
                 name="contact_number"
                 label="Contact Number"
-                rules={[{ required: true, message: "Please enter contact number" }]}
+                rules={[
+                  { required: true, message: "Please enter contact number" },
+                ]}
               >
                 <Input />
               </Form.Item>
-
               <Form.Item
                 name="role"
                 label="Role"
@@ -205,14 +203,14 @@ const HRListPage = () => {
             <Button
               type="default"
               disabled={!selectedHR}
-              onClick={() => selectedHR && form.setFieldsValue(selectedHR)}
+              onClick={() => form.setFieldsValue(selectedHR)}
             >
               Edit
             </Button>
-            <Button type="primary" onClick={handleSave} disabled={!selectedHR}>
+            <Button type="primary" onClick={handleSave}>
               Update
             </Button>
-            <Button onClick={() => { form.resetFields(); setSelectedHR(null); }}>Cancel</Button>
+            <Button onClick={() => form.resetFields()}>Cancel</Button>
           </Space>
         </div>
       </div>
