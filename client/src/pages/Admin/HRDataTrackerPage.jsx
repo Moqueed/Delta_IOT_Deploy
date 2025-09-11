@@ -27,108 +27,18 @@ import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useAdmin } from "../../components/AdminContext";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 const { RangePicker } = DatePicker;
 
 const HRDataTrackerPage = () => {
   const [trackerData, setTrackerData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const [statusFilter, setStatusFilter] = useState(undefined);
-  const [hrFilter, setHrFilter] = useState(undefined);
+  const [statusFilter, setStatusFilter] = useState(null);
+  const [hrFilter, setHrFilter] = useState(null);
   const [dateRange, setDateRange] = useState([]);
-  const { adminName } = useAdmin();
   const [isModalVisible, setIsModalVisible] = useState(false);
-
-  useEffect(() => {
-    fetchTrackerData();
-  }, []);
-
-  const fetchTrackerData = async () => {
-    try {
-      const data = Array.isArray(await getHRDataEntries()) ? await getHRDataEntries() : [];
-      const result = Array.isArray(await fetchFilteredTrackerFromActiveList({}))
-        ? await fetchFilteredTrackerFromActiveList({})
-        : [];
-      setTrackerData(data);
-      setFilteredData(result);
-    } catch (error) {
-      message.error("Failed to load HR Data Tracker");
-      console.error(error);
-    }
-  };
-
-  const handleFilter = async () => {
-    try {
-      const filters = {
-        status: statusFilter,
-        hr_name: hrFilter,
-        startDate: dateRange?.[0]?.format("YYYY-MM-DD"),
-        endDate: dateRange?.[1]?.format("YYYY-MM-DD"),
-      };
-      const result = Array.isArray(await fetchFilteredTrackerFromActiveList(filters))
-        ? await fetchFilteredTrackerFromActiveList(filters)
-        : [];
-      setFilteredData(result);
-    } catch (error) {
-      message.error("Failed to apply filters");
-      console.error(error);
-    }
-  };
-
-  const handleExport = () => {
-    const exportData = (Array.isArray(filteredData) ? filteredData : []).map((item) => ({
-      "HR Name": item.HR_name ?? "",
-      "Candidate Name": item.candidate_name ?? "",
-      Position: item.position ?? "",
-      Status: item.progress_status ?? "",
-      "Status Date": item.status_date ? moment(item.status_date).format("DD/MM/YYYY") : "",
-      "Entry Date": item.entry_date ? moment(item.entry_date).format("DD/MM/YYYY") : "",
-    }));
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Tracker Report");
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(data, "HR_Data_Tracker_Report.xlsx");
-  };
-
-  const clearFilters = () => {
-    setStatusFilter(undefined);
-    setHrFilter(undefined);
-    setDateRange([]);
-    setFilteredData(Array.isArray(trackerData) ? trackerData : []);
-  };
-
-  const handleLogout = () => {
-    localStorage.clear();
-    message.success("Logout successfully");
-    window.location.href = "/login";
-  };
-
-  const showAnalysis = () => setIsModalVisible(true);
-  const closeAnalysis = () => setIsModalVisible(false);
-
-  const statusCount = (Array.isArray(filteredData) ? filteredData : []).reduce((acc, item) => {
-    const key = item.progress_status ?? "Unknown";
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {});
-
-  const pieData = Object.entries(statusCount).map(([status, count]) => ({ name: status, value: count }));
-
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#845EC2", "#FF6F91"];
-
-  const allHRNames = Array.isArray(trackerData)
-    ? [...new Set(trackerData.map((item) => item?.name).filter(Boolean))]
-    : [];
+  const { adminName } = useAdmin();
 
   const STATUS_OPTIONS = [
     "Application Received",
@@ -147,6 +57,96 @@ const HRDataTrackerPage = () => {
     "Buffer",
     "Hold",
   ];
+
+  const COLORS = [
+    "#0088FE",
+    "#00C49F",
+    "#FFBB28",
+    "#FF8042",
+    "#845EC2",
+    "#FF6F91",
+  ];
+
+  useEffect(() => {
+    fetchTrackerData();
+  }, []);
+
+  const fetchTrackerData = async () => {
+    try {
+      const data = await getHRDataEntries();
+      const result = await fetchFilteredTrackerFromActiveList({});
+      setTrackerData(Array.isArray(data) ? data : []);
+      setFilteredData(Array.isArray(result) ? result : []);
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to load HR Data Tracker");
+    }
+  };
+
+  const handleFilter = async () => {
+    try {
+      const filters = {
+        status: statusFilter,
+        hr_name: hrFilter,
+        startDate: dateRange?.[0]?.format("YYYY-MM-DD"),
+        endDate: dateRange?.[1]?.format("YYYY-MM-DD"),
+      };
+      const result = await fetchFilteredTrackerFromActiveList(filters);
+      setFilteredData(Array.isArray(result) ? result : []);
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to apply filters");
+    }
+  };
+
+  const handleExport = () => {
+    const exportData = (filteredData || []).map((item) => ({
+      "HR Name": item.HR_name,
+      "Candidate Name": item.candidate_name,
+      Position: item.position,
+      Status: item.progress_status,
+      "Status Date": item.status_date
+        ? moment(item.status_date).format("DD/MM/YYYY")
+        : "",
+      "Entry Date": item.entry_date
+        ? moment(item.entry_date).format("DD/MM/YYYY")
+        : "",
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Tracker Report");
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(data, "HR_Data_Tracker_Report.xlsx");
+  };
+
+  const clearFilters = () => {
+    setStatusFilter(null);
+    setHrFilter(null);
+    setDateRange([]);
+    setFilteredData(Array.isArray(trackerData) ? trackerData : []);
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    message.success("Logout successfully");
+    window.location.href = "/login";
+  };
+
+  const showAnalysis = () => setIsModalVisible(true);
+  const closeAnalysis = () => setIsModalVisible(false);
+
+  // Prepare data for charts
+  const statusCount = (filteredData || []).reduce((acc, item) => {
+    acc[item.progress_status] = (acc[item.progress_status] || 0) + 1;
+    return acc;
+  }, {});
+
+  const pieData = Object.entries(statusCount).map(([name, value]) => ({ name, value }));
+
+  const allHRNames = Array.isArray(trackerData)
+    ? [...new Set(trackerData.map((item) => item?.name).filter(Boolean))]
+    : [];
 
   const columns = [
     { title: "HR Name", dataIndex: "HR_name", key: "HR_name" },
@@ -180,7 +180,14 @@ const HRDataTrackerPage = () => {
         <h2>HR Data Tracker</h2>
         <div className="header-right">
           <span className="welcome-text">Welcome: {adminName}</span>
-          <Button icon={<LogoutOutlined />} onClick={handleLogout} type="primary" danger size="small" style={{ marginLeft: 15 }}>
+          <Button
+            icon={<LogoutOutlined />}
+            onClick={handleLogout}
+            type="primary"
+            danger
+            size="small"
+            style={{ marginLeft: 15 }}
+          >
             Logout
           </Button>
         </div>
@@ -191,25 +198,34 @@ const HRDataTrackerPage = () => {
         <Space wrap size="middle">
           <Select
             placeholder="Status"
-            value={statusFilter}
+            value={statusFilter ?? undefined}
             onChange={setStatusFilter}
             style={{ width: 180 }}
             allowClear
-            options={Array.isArray(STATUS_OPTIONS) ? STATUS_OPTIONS.map((status) => ({ label: status, value: status })) : []}
+            options={STATUS_OPTIONS.map((status) => ({ label: status, value: status }))}
           />
+
           <Select
             placeholder="HR Name"
-            value={hrFilter}
+            value={hrFilter ?? undefined}
             onChange={setHrFilter}
             style={{ width: 180 }}
             allowClear
             options={allHRNames.map((name) => ({ label: name, value: name }))}
           />
+
           <RangePicker value={dateRange} onChange={setDateRange} format="MM/DD/YYYY" />
-          <Button type="primary" onClick={handleFilter}>Apply Filter</Button>
+
+          <Button type="primary" onClick={handleFilter}>
+            Apply Filter
+          </Button>
           <Button onClick={clearFilters}>Clear Filter</Button>
-          <Button type="primary" onClick={handleExport}>Export</Button>
-          <Button type="primary" onClick={showAnalysis} icon={<PieChartOutlined />}>Analysis</Button>
+          <Button type="primary" onClick={handleExport}>
+            Export
+          </Button>
+          <Button type="primary" onClick={showAnalysis} icon={<PieChartOutlined />}>
+            Analysis
+          </Button>
         </Space>
       </div>
 
@@ -217,31 +233,39 @@ const HRDataTrackerPage = () => {
       <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
         <Col>
           <Card title="Total Candidates">
-            <UserOutlined /> {(Array.isArray(filteredData) ? filteredData.length : 0)}
+            <UserOutlined /> {filteredData.length}
           </Card>
         </Col>
-        {Array.isArray(Object.entries(statusCount)) ? Object.entries(statusCount).map(([status, count], idx) => (
+        {Object.entries(statusCount).map(([status, count], idx) => (
           <Col key={idx}>
             <Card title={status}>{count}</Card>
           </Col>
-        )) : null}
+        ))}
       </Row>
 
       {/* Table */}
       <Table
         columns={columns}
         dataSource={Array.isArray(filteredData) ? filteredData : []}
-        rowKey={(record, index) => record.id ?? index}
+        rowKey={(record) => record.id}
         bordered
         pagination={{ pageSize: 10 }}
       />
 
       {/* Modal Analysis */}
-      <Modal title="Candidate Status Analysis" open={isModalVisible} onCancel={closeAnalysis} footer={null} width={700}>
+      <Modal
+        title="Candidate Status Analysis"
+        open={isModalVisible}
+        onCancel={closeAnalysis}
+        footer={null}
+        width={700}
+      >
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
-            <Pie data={Array.isArray(pieData) ? pieData : []} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-              {Array.isArray(pieData) ? pieData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />) : null}
+            <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+              {pieData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
             </Pie>
             <Tooltip />
             <Legend />
